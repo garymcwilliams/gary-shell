@@ -25,7 +25,6 @@ cygwin="$?"
 if [ $cygwin = 0 ]; then
     # convert the initial windows path (replacing space-filled names e.g. Program Files as necessary)
     #export PATHWIN=$PATH
-	echo "path"
     PATH=`cygpath --mixed --path --short-name "$PATH" | xargs cygpath --unix --path`
     #export PATHORIG=$PATH
     #; Start with a basic PATH - then addon/override in aliases
