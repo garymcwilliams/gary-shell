@@ -52,7 +52,7 @@ if [ ".$VIM" = "." ]; then
 	export VIM=~/shell/vim
 fi
 if [ ".$VIMRUNTIME" = "." ]; then
-	export VIMRUNTIME=/d/tools/Vim/vim70
+	export VIMRUNTIME=/d/tools/Vim/vim71
 fi
 
 # This is a LAGAN box, so add in LAGAN stuff
