@@ -1,0 +1,79 @@
+#!/bin/sh
+#; $HOME/.shell/local_aliases
+#; Local aliases customized on a "per host" basis.
+
+#; override default for local machine setup
+CVSDEFAULTWORKDIR="/d/projects/cvsroot"
+CVSWORKDIR="${CVSDEFAULTWORKDIR}"
+
+emacsunix=`cygpath --unix "d:/tools/emacs-21.3/bin"`
+emacswin=`cygpath --windows "d:/tools/emacs-21.3/bin"`
+emacsexecu="$emacsunix/runemacs.exe"
+emacsexecw="$emacswin/runemacs.exe"
+
+alias gvim='d:/Vim/vim61/gvim.exe'
+#; use local 'gvi' shell script to wrap up vi
+alias vi='gvim'
+
+#alias vim='vim -u ~/_vimrcempty '
+alias vim='gvim'
+
+puttyhome="d:/tools/putty"
+alias putty='$puttyhome/putty.exe'
+alias plink='$puttyhome/plink.exe'
+
+alias cygsetup='d:/Down/Apps/cygwin/setup.exe'
+
+alias emacs=edit
+
+EDITOR="edit"
+VISUAL="${EDITOR}"
+export EDITOR VISUAL
+export CVSEDITOR=$emacswin/emacs.exe
+
+alias prj='cd /cygdrive/d/projects'
+#; eclipse workspace
+alias ewk='cd ${CVSWORKDIR}/workspace'
+alias fl4='cd /cygdrive/d/projects/frontline4/devsource/projects/lagancentre;. setrcs'
+alias fl4b='cd /cygdrive/d/projects/frontline4/buildsource/projects/lagancentre;. setrcs'
+alias fl50='cd /cygdrive/d/projects/frontline5.0/devsource/projects/lagancentre;. setrcs'
+alias fl50b='cd /cygdrive/d/projects/frontline5.0/buildsource/projects/lagancentre;. setrcs'
+alias fl5='cd /cygdrive/d/projects/frontline5/devsource/projects/lagancentre;. setrcs'
+alias fl5b='cd /cygdrive/d/projects/frontline5/buildsource/projects/lagancentre;. setrcs'
+alias fl5p='cd /cygdrive/d/projects/frontline5/patchsource/projects/lagancentre;. setrcs'
+alias fl5r='cd /cygdrive/d/projects/frontline5/rcssource/projects/lagancentre;. setrcs'
+alias fll='cd /cygdrive/l/Projects/lagancentre;. setrcs'
+alias fllb='cd /cygdrive/l/Projects/lagancentre/build/frontline;. setrcs'
+alias flamends='cd /cygdrive/l/Projects/lagancentre/change/amends;. setrcs'
+# NEW frontline alias, to be used in preference to the above
+# only works when you are in one of the frontline directories already!
+alias flrcs='. setrcs'
+
+alias rcsl='. setrcs -l'
+alias rcs4='. setrcs -4'
+alias rcs5='. setrcs -5'
+alias rcs4b='. setrcs -4 -b'
+alias rcs5b='. setrcs -5 -b'
+
+alias cvsnt='D:/tools/cvs/cvs-1.11.5/cvs-1.11.5.exe'
+#; override cvs to ensure usage of the nt version
+alias cvs='cvsnt'
+
+alias product='sqlplus product/lagan@anthodon'
+alias prodpull='sqlplus prodpull/case@anthodon'
+alias gary='sqlplus gary/lagan@compiere'
+
+edit ()
+{
+#    cd `dirname $1` >/dev/null
+#    $emacswin/runemacs.exe `basename $1` >/dev/null &
+	# expand the full path of each file
+	files=
+	for f in $*
+	do
+	  files="$files `cygpath --windows $f`"
+	done
+    $emacswin/runemacs.exe $files
+}
+
+#; $Id: local_aliases,v 1.2 2004/11/30 11:13:35 gary Exp $

@@ -1,0 +1,76 @@
+#!/bin/bash
+#; bashrc
+#; Local specific setup
+
+#echo in ~/shell/.shell/local_maigue/bashrc
+#date
+
+#; Gary Added Java
+#java=/d/j2sdk1.4.1_01
+# set java, let lagan bashrc configure it
+#java=/d/java/j2sdk1.4.2_07
+#java=/d/java/jre1.5.0_01
+java=/d/java/jdk1.5.0_08
+
+#; Gary Added ant
+if [ ".$ANT_HOME" = "." ]; then
+	ant=/d/tools/apache-ant-1.6.5
+	ANT_HOME=`cygpath --windows $ant`
+else
+	ant=`cygpath --unix "$ANT_HOME"`
+fi
+
+#; Gary Added Maven
+if [ ".$MAVEN_HOME" = "." ]; then
+	maven=/d/tools/maven/maven-2.0.6
+	MAVEN_HOME=`cygpath --windows $maven`
+else
+	maven=`cygpath --unix "$MAVEN_HOME"`
+fi
+MAVEN_HOME_LOCAL=/d/home/gary/.maven/plugins
+
+#; Gary Added Forrest
+#if [ ".$FORREST_HOME" = "." ]; then
+#	forrest=/d/projects/svnroot/forrest/src/core
+#	FORREST_HOME=`cygpath --windows $forrest`
+#else
+#	forrest=`cygpath --unix "$FORREST_HOME"`
+#fi
+
+#; Gary Added Groovy
+if [ ".$GROOVY_HOME" = "." ]; then
+	groovy=/d/tools/groovy-1.0-JSR-06
+	GROOVY_HOME=`cygpath --windows $groovy`
+else
+	groovy=`cygpath --unix "$GROOVY_HOME"`
+fi
+groovy_scripts_dir=/d/prod-build-1/util/DefectReporting/trunk/src/groovy
+third_party_libs=/d/projects/frontline/frontline-3rd-party-libs
+
+#; Gary Added vim
+if [ ".$VIM" = "." ]; then
+	export VIM=~/shell/vim
+fi
+if [ ".$VIMRUNTIME" = "." ]; then
+	export VIMRUNTIME=/d/tools/Vim/vim70
+fi
+
+# This is a LAGAN box, so add in LAGAN stuff
+if [ -e ~/shell/.shell/local_lagan/bashrc ]; then
+  . ~/shell/.shell/local_lagan/bashrc
+fi
+
+#setup Frontline build
+#export MY_BUILD_DIR=/d/frontlinebuild
+export MY_BUILD_DIR=d:/frontlinebuild
+export MY_CD_DIR=/d/frontlinecd
+#export MY_EXTRA_LIBS=/d/frontlinebuild/lib
+export MY_EXTRA_LIBS=d:/frontlinebuildlib
+export MY_JDK_DIR=$java
+export MY_ROOT_DIR=/d
+export MY_WIN_PATH=`cygpath --unix --sysdir`
+#export MY_WIN_PATH=/c/winnt/system32
+
+export MY_BUILD_PREFIX=5-1-1-0
+
+#; $Id: bashrc,v 1.15 2005/02/07 10:53:06 gary Exp $

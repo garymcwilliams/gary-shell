@@ -1,0 +1,7 @@
+# setup the CVS environment
+
+export CVSROOT=:pserver:gary_mcw@ardhoom:2402/lagan/CVSROOT
+
+# cd ..
+# cvs co .shell
+

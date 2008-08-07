@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# script to recursively find writable source files
+#
+
+java=y
+cpp=y
+c=y
+xml=y
+xsl=y
+sql=y
+
+valid=1
+
+OPTIND=1
+while getopts "jcpxsl" Option
+do
+  case $Option in
+    j     ) java=n;;
+	p     ) cpp=n;;
+	x     ) xml=n;;
+	s     ) sq=n;;
+	l     ) xsl=n;;
+    c     ) c=n;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+
+
+suffixes=""
+
+if [ "$java" = "y" ]; then
+	suffixes="$suffixes java"
+fi
+if [ "$cpp" = "y" ]; then
+	suffixes="$suffixes cpp"
+fi
+if [ "$c" = "y" ]; then
+	suffixes="$suffixes c"
+fi
+if [ "$xml" = "y" ]; then
+	suffixes="$suffixes xml"
+fi
+if [ "$xsl" = "y" ]; then
+	suffixes="$suffixes xsl"
+fi
+if [ "$sql" = "y" ]; then
+	suffixes="$suffixes sql"
+fi
+
+
+
+#for codetype in java cpp c h xml xsl htm txt sql
+#echo sfx $suffixes
+for codetype in $suffixes
+do
+  find . -name "*.$codetype" -perm +u+w -print
+done
+# following is 'correct' version, but it's suddenly stopped working!!!
+#  find . -name "*.$codetype" -perm +u+w -exec ls -l "{}" ";"
+
+# $Id: findwritable,v 1.1 2003/06/06 12:03:22 gary Exp $

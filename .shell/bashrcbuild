@@ -1,0 +1,50 @@
+#! /bin/bash
+#; bashrcbuild
+#; Setup environment for building frontline
+
+# export everything
+set -a
+
+SHELL=bash
+export SHELL
+
+# unset mail checking
+unset MAILCHECK
+
+#; Start with a basic PATH - then addon/override in aliases
+PATH="$PATH:/usr/bin:/usr/sbin:/bin:/sbin"
+export PATH
+
+#; Add in local directories, just for fun and convenience
+PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
+export PATH
+
+#; This will check the Operating System type and set the toolkit
+#; appropriately. I'm sick of re-porting my tools around. For anything
+#; that requires "special" tuning, create a seperate toolkit function
+#; for that distribution and set it up via the "case" statement below.
+UNAME="`uname -s`"
+export UNAME
+
+#; Check the node name and setup specifics based on that.
+NODENAME="`uname -n`"
+export NODENAME
+
+#; Localised configuration
+#if [ -f ${HOME}/.shell/local/bashrc ]; then
+#      . ${HOME}/.shell/local/bashrc
+#fi
+
+#; Standard aliases sourced from a seperate file.
+#if [ -f ${HOME}/.shell/aliases ]; then
+#      . ${HOME}/.shell/aliases
+#fi
+
+#; Local aliases per host - done last for override.
+#if [ -f ${HOME}/.shell/local/local_aliases ]; then
+#      . ${HOME}/.shell/local/local_aliases
+#fi
+
+alias cp="cp -f "
+alias mv="mv -f "
+#; $Id: bashrcbuild,v 1.1 2003/05/29 17:43:04 gary Exp $

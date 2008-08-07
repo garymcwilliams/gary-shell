@@ -1,0 +1,22 @@
+echo $PATH
+type getalltest
+for j in `cmls -F`
+do
+  endch=`expr "$j" : '.*\(.\)$'`
+  #rest=`expr "$j" : '\(.*\).$'`
+  #echo j=$j
+  #echo endch=$endch
+  #echo rest=$rest
+  if [ "$endch" = "/" ]
+  then
+    echo Processing $j
+    echo $PATH
+    type getalltest
+    mkdir -p $j
+    cd $j
+    getall
+    cd ..
+  else
+    cmget $j
+  fi
+done

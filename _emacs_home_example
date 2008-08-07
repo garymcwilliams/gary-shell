@@ -1,0 +1,6 @@
+;; This is a 'pointer' file held in my home dir, that just executes the
+;; correct file from the cvsroot folder
+
+(add-to-list 'load-path (expand-file-name "D:/projects/cvsroot/shell"))
+
+(load "_emacs")

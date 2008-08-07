@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#; override vi handling to deal with NT / Unix path name issues
+
+cd `dirname $1` >/dev/null
+#; for some weird reason, aliases will not work in this command
+GVIM='d:/Vim/vim61/gvim.exe'
+$GVIM `basename $1` &

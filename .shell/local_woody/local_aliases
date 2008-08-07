@@ -1,0 +1,66 @@
+#!/bin/sh
+#; $HOME/.shell/local_aliases
+#; Local aliases customized on a "per host" basis.
+
+alias prj='cd /e/projects'
+#; eclipse workspace
+alias ewk='cd ${CVSWORKDIR}/workspace'
+
+#; override default for local machine setup
+CVSDEFAULTWORKDIR="/e/projects/cvsroot"
+CVSWORKDIR="${CVSDEFAULTWORKDIR}"
+
+emacsunix=`cygpath --unix "d:/tools/emacs-21.3/bin"`
+emacswin=`cygpath --windows "d:/tools/emacs-21.3/bin"`
+emacsexecu="$emacsunix/runemacs.exe"
+emacsexecw="$emacswin/runemacs.exe"
+
+#alias gvim='d:/Vim/vim61/gvim.exe'
+#; use local 'gvi' shell script to wrap up vi
+#alias vi='gvim'
+
+#alias vim='vim -u ~/_vimrcempty '
+#alias vim='gvim'
+
+puttyhome="d:/tools/putty"
+alias putty='$puttyhome/putty.exe'
+alias plink='$puttyhome/plink.exe'
+
+#alias cygsetup='d:/Down/Apps/cygwin/setup.exe'
+
+alias vim='VIM=`cygpath -d $VIM` HOME=`cygpath -d $HOME` `cygpath -u $VIM`/vim63/gvim.exe' 
+
+alias emacs=emacsfunc
+
+EDITOR=vim
+VISUAL="${EDITOR}"
+export EDITOR VISUAL
+export CVSEDITOR=$EDITOR
+export SVNEDITOR=$EDITOR
+
+alias mytools='cd ~/tools'
+
+emacsfunc ()
+{
+#    cd `dirname $1` >/dev/null
+#    $emacswin/runemacs.exe `basename $1` >/dev/null &
+    $emacswin/runemacs.exe `cygpath --windows $*`
+}
+
+jedithome=/d/tools/jEdit4.2
+jedit ()
+{
+    java -jar `cygpath --windows --mixed $jedithome/jedit.jar` -reuseview `cygpath --windows --mixed $*` &
+}
+
+ged()
+{
+	# expand the full path of each file
+	VIM=`cygpath -d $VIM`
+	VIMRUNTIME=`cygpath -d $VIMRUNTIME`
+	HOME=`cygpath -d $HOME`
+	files=`cygpath --mixed --absolute $*`
+	`cygpath -u $VIMRUNTIME`/gvim.exe $files &
+}
+
+#; $Id: local_aliases,v 1.5 2004/12/14 22:40:18 gary Exp $

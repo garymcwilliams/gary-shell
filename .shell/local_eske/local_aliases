@@ -1,0 +1,78 @@
+#!/bin/sh
+#; $HOME/.shell/local_aliases
+#; Local aliases customized on a "per host" basis.
+
+echo in ~/.shell/local_eske/local_aliases
+date
+
+
+emacsunix=`cygpath --unix "d:/tools/emacs-21.3/bin"`
+emacswin=`cygpath --windows "d:/tools/emacs-21.3/bin"`
+emacsexecu="$emacsunix/runemacs.exe"
+emacsexecw="$emacswin/runemacs.exe"
+
+alias gvim='d:/Vim/vim61/gvim.exe'
+#; use local 'gvi' shell script to wrap up vi
+alias vi='gvim'
+
+#alias vim='vim -u ~/_vimrcempty '
+alias vim='gvim'
+
+jeditwin=`cygpath --windows --mixed /d/tools/jEdit_4.2`
+
+puttyhome="d:/tools/putty"
+alias putty='$puttyhome/putty.exe'
+alias plink='$puttyhome/plink.exe'
+
+alias cygsetup='d:/Down/Apps/cygwin/setup.exe'
+
+# use emacs as fail-safe editor
+EDITOR=$emacsunix/emacs.exe
+VISUAL="${EDITOR}"
+export EDITOR VISUAL
+export CVSEDITOR=$emacswin/emacs.exe
+export SVNEDITOR=$emacswin/emacs.exe
+
+#; eclipse workspace
+alias ewk='cd ${CVSWORKDIR}/workspace'
+
+alias j142='export JAVA_HOME=d:/java/j2sdk1.4.2_07'
+
+emacs ()
+{
+#    cd `dirname $1` >/dev/null
+#    $emacswin/runemacs.exe `basename $1` >/dev/null &
+	# expand the full path of each file
+	files=
+	for f in $*
+	do
+	  files="$files `cygpath --windows $f`"
+	done
+    $emacswin/runemacs.exe $files
+}
+
+jedit ()
+{
+	# expand the full path of each file
+	files=
+	for f in $*
+	do
+	  files="$files `cygpath --windows $f`"
+	done
+    java -jar $jeditwin/jedit.jar -reuseview -background $files &
+}
+
+jeditwin_43=`cygpath --windows --mixed /d/tools/jedit_4.3`
+
+jedit1 ()
+{
+	# expand the full path of each file
+	files=
+	for f in $*
+	do
+	  files="$files `cygpath --windows $f`"
+	done
+    java -jar $jeditwin_43/jedit.jar -reuseview -background $files &
+}
+
+#; $Id: local_aliases,v 1.20 2005/02/07 10:53:33 gary Exp $

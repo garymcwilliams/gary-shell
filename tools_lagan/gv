@@ -1,0 +1,27 @@
+#!/bin/bash
+# !/bin/bash -x
+#
+# Wrapper script that runs groovyc compiled source files, by setting up correct classpath
+
+JAVA_BIN=`cygpath --unix $JAVA_HOME/bin`
+GROOVY_VER=groovy-1.0-jsr-03
+GROOVY_DIR=/d/tools/$GROOVY_VER
+echo GROOVY_JAR=`cygpath --unix $GROOVY_DIR/${GROOVY_VER}.jar`
+GROOVY_JAR=`cygpath --unix $GROOVY_DIR/${GROOVY_VER}.jar`
+
+JAR_DIR=`cygpath --unix $GROOVY_DIR/lib`
+JARS="asm-2.0.jar
+asm-tree-2.0.jar
+ojdbc14.jar"
+
+cp=""
+
+for jar in $JARS
+do
+  cp=$cp:$JAR_DIR/$jar
+done
+
+CLASSPATH="`cygpath --windows --path $GROOVY_JAR`;`cygpath --windows --path $cp`"
+
+echo CLASSPATH=$CLASSPATH
+$JAVA_BIN/java -cp $CLASSPATH $PROG_NAME $*

@@ -1,0 +1,46 @@
+#!/bin/bash
+# !/bin/bash -x
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+# setup Java path
+INSTALL_DIR=/d/projects/frontline$FLVER/frontlinebuild
+if [ ! -d $INSTALL_DIR ]; then
+	echo "could not find: $INSTALL_DIR"
+	exit 2
+fi
+
+JAVA_BIN=`cygpath --unix $JAVA_HOME/bin`
+SERVER_NAME=${MY_SERVER_NAME:-"shannon"}
+
+PROG_NAME=com.lagan.lagancentre.tools.portlettool.PortletTool
+LIB_DIR=`cygpath --unix $INSTALL_DIR/lib`
+LIBS="db2java.zip
+classes12.zip
+msutil.jar
+msbase.jar
+mssqlserver.jar"
+
+JAR_DIR=`cygpath --unix $INSTALL_DIR`
+JARS="Tools.jar
+Util.jar"
+
+cp=""
+for jar in $JARS
+do
+  cp=$cp:$JAR_DIR/$jar
+done
+
+for lib in $LIBS
+do
+  cp=$cp:$LIB_DIR/$lib
+done
+
+CLASSPATH="`cygpath --windows $INSTALL_DIR`;`cygpath --windows --path $cp`"
+
+cd $INSTALL_DIR
+
+$JAVA_BIN/java -cp $CLASSPATH $PROG_NAME $*

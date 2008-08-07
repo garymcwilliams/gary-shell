@@ -1,0 +1,119 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+
+. clearenv
+
+outputusage()
+{
+	echo "Usage: buildcore [-c] [-l] [-o] [-e] [-r] [-p \"ARGS\"]"
+	echo "   buildcore will build the version of frontline"
+	echo "        The version to be built is defined in the FLVER env var"
+	echo "   -c : do not clean the build destination before building"
+	echo "   -l : do *not* log the output"
+	echo "   -o : obfuscate"
+	echo "   -n : do *not* sign"
+	echo "   -e : Build into the eclipse environment"
+	echo "   -r : Pass the 'do not remove classes' onto the build"
+	echo "   -p : pass on elements contained within \"ARGS\" to the buildcore process"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+clean=y
+log=y
+eclipse=n
+valid=1
+passthrough=
+obfuscate=
+removeclasses=
+sign=
+
+OPTIND=1
+while getopts "cerlonp:" Option
+do
+  case $Option in
+    c     ) clean=n;;
+    l     ) log=n;;
+    e     ) eclipse=y;;
+    r     ) removeclasses=-r;;
+    o     ) obfuscate=-o;;
+    n     ) sign=-n;;
+    p     ) passthrough=$OPTARG;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+echo "using Version $usev environment"
+if [ $eclipse = "y" ]
+then
+	. envbuild -e
+else
+	. envbuild
+fi
+
+# only clean up the standard build environment
+if [ $clean = "y" -a $eclipse = "n" ];
+then
+	cleanbuild
+fi
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+
+if [ ! -f ./buildcore.ksh ];
+then
+  echo "could not find ./buildcore.ksh, you are not in correct directory"
+  exit
+fi
+
+
+echo "build dir: $MY_BUILD_DIR"
+
+if [ $eclipse = y ]
+then
+	# for eclipse, we want to leave all the class files behind
+	removeclasses=-r
+fi
+
+mycommand="./buildcore.ksh $obfuscate $sign $removeclasses $passthrough"
+echo $mycommand
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell
+if [ $log = "y" ];
+then
+	logfile=$MY_ROOT_DIR/buildcore.log
+	echo logging to $logfile
+	bash $mycommand > $logfile 2>&1
+	grep -A 2 -i "\^" $logfile 2>&1 >/dev/null
+	ok=$?
+	if [ "$ok" = "0" ]; then
+		echo "compilation errors found"
+		grep -B 4 -i "\^" $logfile
+	fi
+else
+	bash $mycommand
+fi
+
+# $Id: buildcore,v 1.13 2004/12/15 17:47:15 gary Exp $

@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+
+outputusage()
+{
+#	echo "Usage: buildodm -v [4|5|5.0] [-c] [-l] [-o] [-p \"ARGS\"]"
+	echo "Usage: buildcore [-l] [-o] [-e] [-p \"ARGS\"]"
+	echo "   buildodm will build the version of frontline"
+#	echo "   -c : clean the build destination before building"
+	echo "   -l : log the output (causes process to be run as background job)"
+	echo "   -o : Don't obfuscate"
+	echo "   -e : Build into the eclipse environment"
+	echo "   -p : pass on elements contained within \"ARGS\" to the buildodm process"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+clean=n
+log=y
+eclipse=n
+valid=1
+passthrough=
+obfuscate=
+
+OPTIND=1
+while getopts "elop:" Option
+do
+  case $Option in
+    l     ) log=n;;
+    e     ) eclipse=y;;
+    o     ) obfuscate=-o;;
+    p     ) passthrough=$OPTARG;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+
+echo "using Version $usev environment"
+if [ $eclipse = "y" ]
+then
+	. envbuild -e
+else
+	. envbuild
+fi
+
+# only clean up the standard build environment
+if [ $clean = "y" -a $eclipse = "n" ];
+then
+	cleanbuild
+fi
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+
+if [ ! -f ./buildodm.ksh ];
+then
+  echo "could not find ./buildodm.ksh, you are not in correct directory"
+fi
+
+
+echo "build dir: $MY_BUILD_DIR"
+
+mycommand="./buildodm.ksh $obfuscate $passthrough"
+echo $mycommand
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell
+if [ $log = "y" ];
+then
+	logfile=$MY_ROOT_DIR/buildodm.log
+	echo logging to $logfile
+	bash $mycommand > $logfile 2>&1
+	grep -A 2 -i "\^" $logfile 2>&1 >/dev/null
+	ok=$?
+	if [ "$ok" = "0" ]; then
+		echo "compilation errors found"
+		grep -B 4 -i "\^" $logfile
+	fi
+else
+	bash $mycommand
+fi
+
+# $Id: buildodm,v 1.5 2004/12/15 17:47:15 gary Exp $

@@ -1,0 +1,8 @@
+
+Environment configuration for the Bourne-Again Shell (bash). 
+
+This has been tested with bash 2.0 and above. Move the file
+named dot-bash_profile to ~/.bash_profile. Move the rest of
+the files here to ~/.shell
+
+<eric@catastrophe.net>

@@ -1,0 +1,103 @@
+#!/bin/bash
+#
+# script to clean up temp files
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` [-a] [-r]"
+	echo "   `basename $0` will tidyup working files on the whole disk"
+	echo "   -a : tidyup all on disk, rather than current folder"
+	echo "   -r : does a recursive tidyup if -a is not being used"
+	exit 2
+}
+
+tidy()
+{
+	dir=$1
+	pattern=$2
+	recurse=$3
+	maxdepth=
+	if [ $recurse = n ]; then
+		maxdepth="-maxdepth 1"
+	fi
+	find $dir $maxdepth -name "$pattern" -print | xargs -rt rm -f
+}
+
+
+tidyFiles()
+{
+	dir=$1
+	recurse=$2
+#	for pattern in $tidypatterns
+#	do
+#	  tidy $dir "$pattern" $recurse
+#	done
+
+	tidy $1 "*~" $recurse
+	tidy $1 ".*~" $recurse
+	tidy $1 "#*#" $recurse
+	tidy $1 ".#*#" $recurse
+	tidy $1 "*com.ent" $recurse
+}
+
+
+tidyDisk()
+{
+	for dir in $tidyroots
+	do
+	  tidyFiles $dir y
+	done
+}
+
+tidyDir()
+{
+	recurse=$1
+	tidyFiles `pwd` $recurse
+}
+
+tidyroots="
+/h
+/d/projects
+"
+
+tidypatterns="
+*~
+.*~
+#*#
+.#*#
+"
+
+# default = tidy folder
+tidydisk=n
+recurse=n
+
+valid=1
+OPTIND=1
+while getopts "ar" Option
+do
+  case $Option in
+    a     ) tidydisk=y;;
+    r     ) recurse=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+# recurce only valid if -a not specified
+if [ $recurse = y -a $tidydisk = y ]; then
+	echo "-r is implied with -a"
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+if [ $tidydisk = y ]
+then
+	tidyDisk
+else
+	tidyDir $recurse
+fi

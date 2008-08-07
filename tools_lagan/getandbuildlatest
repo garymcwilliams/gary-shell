@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# script to get the latest core & then build it
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` [-e] [-i] [-o] [-p build-prefix]"
+	echo "   `basename $0` will get and build the version of frontline"
+	echo "   -e also build into the eclipse environment"
+	echo "   -p build-prefix : the prefix used to find the 'latest' build, for example 5-1-0-0 will find the latest official 5-1-0 build"
+	echo "   -o obfuscate : if set, does not call obfuscate on the build process"
+	echo "   -i get a build id for a real build"
+	echo "   if no -p is given then the prefix from the variable MY_BUILD_PREFIX will be used"
+	exit 2
+}
+
+
+buildprefix=${MY_BUILD_PREFIX:-""}
+
+valid=1
+buildeclipse=0
+# by default we obfuscate
+obfuscate=-o
+getbuildid=
+
+OPTIND=1
+while getopts "p:eoi" Option
+do
+  case $Option in
+    e     ) buildeclipse=1;;
+    p     ) buildprefix=$OPTARG;;
+    o     ) obfuscate=;;
+	i     ) getbuildid=-i;;
+    *     ) valid=0;;   # DEFAULT
+  esac
+done
+
+if [ "x$buildprefix" = "x" ]; then
+	valid=0
+fi
+
+shift $(($OPTIND - 1))
+
+usev=`expr "$buildprefix" : '\(.\)'`
+if [ "$usev" = "4" ]; then
+	valid=0
+fi
+
+if [ $valid = 0 ]; then
+	echo "invalid option specified, please check"
+	outputusage
+fi
+
+
+# find the latest folder matching the build-prefix
+cd /l/Projects/lagancentre/build/frontline
+buildfolder=`ls -d ${buildprefix}* | grep "^[[:digit:]]-[[:digit:]]-[[:digit:]]-[[:digit:]{3}]-*[[:digit:]{8}]" | tail -1`
+
+echo using build:$buildfolder
+
+getcore $buildfolder -J -c -s $getbuildid
+
+# build the application
+buildcore $obfuscate
+
+# if we are also doing an eclipse build, then action that as well
+if [ $buildeclipse = 1 ]
+then
+	buildcore -e
+fi
+
+# $Id: getandbuildlatest,v 1.7 2004/09/10 12:26:42 gary Exp $

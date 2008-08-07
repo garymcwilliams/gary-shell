@@ -1,0 +1,35 @@
+#!/bin/bash
+# !/bin/bash -x
+
+INSTALL_DIR=`cygpath --mixed D:/lagan/c3`
+JAVA_BIN=`cygpath --unix $JAVA_HOME/bin`
+SERVER_NAME=${MY_SERVER_NAME:-"shannon"}
+
+PROG_NAME=com.lagan.lagancentre.tools.servicecontrolcentre.application.ServiceControlCentre
+LIB_DIR=`cygpath --unix $INSTALL_DIR/lib`
+LIBS="db2java.zip
+classes12.zip
+msutil.jar
+msbase.jar
+mssqlserver.jar"
+
+JAR_DIR=`cygpath --unix $INSTALL_DIR/classes`
+JARS="Tools.jar
+Util.jar"
+
+cp=""
+for jar in $JARS
+do
+  cp=$cp:$JAR_DIR/$jar
+done
+
+for lib in $LIBS
+do
+  cp=$cp:$LIB_DIR/$lib
+done
+
+CLASSPATH="`cygpath --windows $INSTALL_DIR`;`cygpath --windows --path $cp`"
+
+cd $INSTALL_DIR/log
+
+$JAVA_BIN/java -cp $CLASSPATH $PROG_NAME

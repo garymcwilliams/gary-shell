@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+# script to prepare the core cd
+#
+# This script will take the latest 'build' from a buildcore and put it into
+# the releasebuild folder, ready for a corecd to be run.
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` [-c]"
+	echo "   `basename $0` will create the cd for the version of frontline"
+	echo "   -c : clean the destination before building"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+clean=n
+
+valid=1
+
+OPTIND=1
+while getopts "c" Option
+do
+  case $Option in
+    c     ) clean=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+echo "using Version $usev environment"
+. envbuild
+
+# convert for cygwin
+releasefolder=`cygpath --unix $MY_CD_ROOT_DIR`
+
+echo "build dir: $MY_BUILD_DIR"
+echo "release dir: $releasefolder"
+echo "releasing version"
+cat $MY_ROOT_DIR/projects/lagancentre/build/frontline/build.manifest
+
+# if cleaning, don't remove anything not part of our release
+if [ $clean = "y" ];
+then
+	echo "cleaning out release dir"
+	for deleteme in `ls -d $MY_BUILD_DIR/*`
+	do
+	  rm -Rf $releasefolder/`basename $deleteme`
+	done
+fi
+
+echo "copying to release dir"
+for copyme in `ls -d $MY_BUILD_DIR/*`
+do
+  cp -rf $MY_BUILD_DIR/`basename $copyme` $releasefolder
+done
+
+echo "installing latest LocalMonitor"
+localmonitorfolder=`cygpath --unix L:/Projects/lagancentre/localmonitor`
+
+cp -f $localmonitorfolder/*.exe $releasefolder/ntlocalmonitor
+cp -f $localmonitorfolder/*.dll $releasefolder/ntlocalmonitor
+
+# $Id: corecdrelease,v 1.3 2004/05/07 16:29:52 gary Exp $

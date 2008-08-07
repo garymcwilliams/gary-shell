@@ -1,0 +1,43 @@
+#!/bin/bash
+# !/bin/bash -x
+
+ver="5-3-0"
+rel="003"
+INSTALL_DIR=`cygpath --mixed D:/Lagan/frontline${ver}-${rel}/frontline/C3`
+JAVA_BIN=`cygpath --unix $JAVA_HOME/bin`
+SERVER_NAME=${MY_SERVER_NAME:-"shannon"}
+
+PROG_NAME=com.lagan.lagancentre.tools.servicecontrolcentre.application.ServiceControlCentre
+LIB_DIR=`cygpath --unix $INSTALL_DIR/lib`
+LIBS="db2java.zip
+classes12.zip
+msutil.jar
+msbase.jar
+mssqlserver.jar"
+
+JAR_DIR=`cygpath --unix $INSTALL_DIR/classes`
+JARS="Tools.jar
+Util.jar"
+
+cp=""
+
+# define the development classpaths to include
+PATH_DEV=`cygpath --unix d:/projects/frontline${ver}-dev/sourcedev/bin`
+PATH_PATCH=`cygpath --unix d:/projects/frontline${ver}-dev/patchsource/bin`
+PATH_BUILD=`cygpath --unix d:/projects/frontline$ver-$rel/sourcebuild/bin`
+cp=$PATH_DEV:$PATH_PATCH:$PATH_BUILD
+
+for jar in $JARS
+do
+  cp=$cp:$JAR_DIR/$jar
+done
+
+for lib in $LIBS
+do
+  cp=$cp:$LIB_DIR/$lib
+done
+
+CLASSPATH="`cygpath --windows $INSTALL_DIR`;`cygpath --windows --path $cp`"
+cd $INSTALL_DIR/log
+
+$JAVA_BIN/java -cp $CLASSPATH $PROG_NAME

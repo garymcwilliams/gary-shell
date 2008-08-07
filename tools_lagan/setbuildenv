@@ -1,0 +1,6 @@
+#! /bin/bash
+#
+# script to setup the default 'build environment' for lagancentre frontline
+
+export PROJECT_BASE=/d/projects/frontlinebuild/projects
+

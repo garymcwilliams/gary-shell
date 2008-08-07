@@ -1,0 +1,121 @@
+#!/bin/bash
+#
+# script to cd into appropriate frontline folder
+# special consideration is applied to the BDS environment
+#
+# by default, BDS is linked against standard 5-0-2 jars, so the bds
+# environment is almost always applied to a 'dev' environment for bds-specific
+# coding. So, bds is normally applied using a -b, but then uses the sourcedev
+# folder as the base
+
+outputusage()
+{
+	echo "Usage: $0 [-b | -d | -s | -p] fl-version"
+	echo "   -b will set into the Build folder, rather than dev folder"
+	echo "   -d will set into the build-specific dev folder, rather than generic dev folder"
+	echo "   -s will set into the bds-specific dev folder"
+	echo "   -p will set into the patch folder"
+	echo "   if none of b,d,s,p are specified then use the generic dev folder"
+	echo " "
+	echo "   the version string is expected to contain the version using the '-' character"
+	echo "   to seperate the build level"
+	echo "   "
+	echo "   Examples:"
+	echo "   'flsetdir 5' will find the very latest build for frontline 5"
+	echo "   'flsetdir 5-1' will find the very latest build for frontline 5-1"
+	echo "   'flsetdir 5-1-2' will find the very latest build for frontline 5-1-2"
+}
+
+srcdir=sourcedev
+buildspecificdev=n
+bdsspecificdev=n
+setrcsopts=
+OPTIND=1
+while getopts "bpds" Option
+do
+  case $Option in
+	b )     srcdir=sourcebuild;
+		    setrcsopts="-b";;
+	p )     srcdir=sourcepatch;
+		    setrcsopts="-p";;
+    d )     buildspecificdev=y;;
+    s )     bdsspecificdev=y;;
+    * )     valid=0;;   # DEFAULT
+  esac
+done
+
+if [ $OPTIND -gt 1 ]; then
+	shift $(($OPTIND - 1))
+fi
+
+if [ $# -ne 1 ]; then
+	valid=0
+fi
+
+if [ "$valid" = "0" ]; then
+	outputusage
+fi
+
+# allow munging of the folder input
+vermajor=`echo $1 | cut -d- -f1`
+verrelse=`echo $1 | cut -d- -f2`
+verminor=`echo $1 | cut -d- -f3`
+verbuild=`echo $1 | cut -d- -f4`
+
+# the specially managed folders
+folderpattern="[[:digit:]]-[[:digit:]]-[[:digit:]].*"
+folderpatternbds="[[:digit:]]-[[:digit:]]-[[:digit:]]-bds.*"
+folderpatterndev="[[:digit:]]-[[:digit:]]-[[:digit:]]-dev.*"
+
+cd /d/projects/frontline
+foldererror=
+if [ "$bdsspecificdev" = "y" ]; then
+	# find the bds dev tree (e.g. 5-0-2-bds)
+	folderpattern=$folderpatternbds
+	foldererror=$1-bds
+#	echo "ls -1d frontline$1* | grep $folderpattern | tail -1"
+	folder=`ls -1d $1* | grep $folderpattern | tail -1`
+elif [ "$buildspecificdev" = "n" -a "$srcdir" = "sourcedev" ]; then
+	# find the generic dev tree (e.g. 5-1-2-dev)
+	folderpattern=$folderpatterndev
+	foldererror=$1-dev
+#	echo "ls -1d frontline$1* | grep $folderpattern | tail -1"
+	# Note that dev never includes the 'build' element, only the major/release/minor
+	folder=`ls -1d $vermajor-$verrelse-$verminor* | grep $folderpattern | tail -1`
+else
+	# find the specific dev tree
+#	echo "ls -1d frontline$1* | grep $folderpattern | grep -v $folderpatterndev | grep -v $folderpatternbds | tail -1"
+	folder=`ls -1d $1* | grep $folderpattern | grep -v $folderpatterndev | grep -v $folderpatternbds | tail -1`
+fi
+#echo folder=$folder
+
+if [ "$folder" = "" ]; then
+	echo $foldererror does not exist, please create it first
+	return 1
+fi
+
+lastchar=`expr "$folder" : '.*\(.\)'`
+#echo lastchar=$lastchar
+if [ "$lastchar" = "/" ]; then
+	folder=`expr "$folder" : '\(.*\).'`
+fi
+
+cd $folder/$srcdir/projects
+cdok=$?
+pwd
+
+if [ $cdok -eq 1 ]; then
+	echo "could not cd, maybe you need to create the folder?"
+	echo "$folder/$srcdir/projects"
+	echo "does not exist under"
+	echo "$folder"
+else
+	version=`expr "$folder" : '\(.*\)'`
+	export FLVER=$version
+	echo FLVER=$FLVER
+	# setup the correct build environment. Needed if using ant
+	. envbuild -a
+	# call this after enbvuild, as envbuild force use of build envionment,
+	# but we may want to override with a dev tree here
+	. setrcs $setrcsopts
+fi

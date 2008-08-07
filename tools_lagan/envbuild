@@ -1,0 +1,149 @@
+#!/bin/bash
+#
+# Script to setup the environment for a build
+#
+outputusage()
+{
+	echo "Usage: envbuild [-e] [-a]"
+	echo "   envbuild will set the correct build environment"
+	echo "   the frontlinebuild is taken from the FLVER env var"
+	echo "   -e : build into eclipse environment"
+	echo "   -a : setup build for ant (uses windows pathnames)"
+	exit 2
+}
+
+makedir()
+{
+	echo creating dir `cygpath --unix $1`
+	mkdir -p `cygpath --unix $1`
+}
+
+makedirs()
+{
+	makedir $1
+	makedir $1/projects/lagancentre/code
+	makedir $1/projects/laganutil/code
+}
+
+usev=${FLVER:-"none"}
+usebuild=0
+useant=n
+valid=1
+
+OPTIND=1
+while getopts "ea" Option
+do
+  case $Option in
+    e     ) usebuild=1;;
+    a     ) useant=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $usev = "none" ]
+then
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+#echo "setting Version $usev environment"
+
+# setup the build environment for MS VC
+. envmsvc
+
+export MY_WIN_PATH=$vcpath
+
+sourcebuild=sourcebuild
+sourcedev=sourcedev
+sourcepatch=sourcepatch
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+# setup Java path
+root=/d/projects/frontline/$usev
+if [ ! -d $root ]; then
+	makedir $root
+fi
+#export MY_ROOT_DIR=$root/buildsource
+export MY_ROOT_DIR=`cygpath --mixed $root/$sourcebuild`
+if [ ! -d $MY_ROOT_DIR ]; then
+	makedirs $MY_ROOT_DIR
+fi
+export MY_PATCH_DIR=`cygpath --mixed $root/$sourcepatch`
+if [ ! -d $MY_PATCH_DIR ]; then
+	makedirs $MY_PATCH_DIR
+fi
+export MY_DEV_DIR=`cygpath --mixed $root/$sourcedev`
+if [ ! -d $MY_DEV_DIR ]; then
+	makedirs $MY_DEV_DIR
+fi
+export PROJECT_BASE=$MY_ROOT_DIR/projects
+
+#export MY_BUILD_DIR=`cygpath --windows $root/frontlinebuild`
+if [ $usebuild = 0 ]; then
+	export MY_BUILD_DIR=$root/frontlinebuild
+	if [ ! -d $MY_BUILD_DIR ]; then
+		makedir $MY_BUILD_DIR
+	fi
+	if [ "$useant" = "y" ]; then
+		export MY_BUILD_DIR=`cygpath --mixed $MY_BUILD_DIR`
+	fi
+else
+	export MY_BUILD_DIR=$MY_ROOT_DIR/bin
+fi
+export MY_CD_DIR=$root/frontlinecd
+if [ ! -d $MY_CD_DIR ]; then
+	makedir $MY_CD_DIR
+fi
+if [ "$useant" = "y" ]; then
+	export MY_CD_DIR=`cygpath --mixed $MY_CD_DIR`
+fi
+#export MY_EXTRA_LIBS=$root/frontlinebuildlib
+export MY_EXTRA_LIBS=$MY_BUILD_DIR/lib
+if [ ! -d $MY_EXTRA_LIBS ]; then
+	makedir $MY_EXTRA_LIBS
+fi
+if [ "$useant" = "y" ]; then
+	export MY_EXTRA_LIBS=`cygpath --mixed $MY_EXTRA_LIBS`
+fi
+# default jdk=1.4
+jdk_dir=/d/java/j2sdk1.4.2_07
+export MY_JDK4_DIR=$jdk_dir
+if [ "$useant" = "y" ]; then
+	export MY_JDK4_DIR=`cygpath --mixed $MY_JDK4_DIR`
+fi
+# check for early-releases which need jdk1.3
+# 5.0.x uses jdk1.3
+# 5.1.1 uses jdk1.3
+# 5.1.2 and above use jdk1.4
+if [ $vermajor -lt 6 ]; then
+	if [ $verrelse -lt 1 ]; then
+		jdk_dir=/d/jdk1.3
+	elif [ $verrelse -lt 2 ]; then
+		if [ $verminor -lt 2 ]; then
+			jdk_dir=/d/jdk1.3
+		fi
+	fi
+fi
+export MY_JDK_DIR=$jdk_dir
+echo MY_JDK_DIR=$MY_JDK_DIR
+if [ "$useant" = "y" ]; then
+	export MY_JDK_DIR=`cygpath --mixed $MY_JDK_DIR`
+fi
+
+#export MY_WIN_PATH=`cygpath --unix --sysdir`
+#export MY_CD_ROOT_DIR=`cygpath --mixed $root/releasebuild`
+#if [ ! -d $MY_CD_ROOT_DIR ]; then
+#	makedir $MY_CD_ROOT_DIR
+#fi
+
+export MY_WSDP_DIR=`cygpath --unix L:/Projects/lagancentre/wsdp-1_0_01`

@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# script to resursively get the latest source
+#
+#; $Id: getall,v 1.4 2003/11/19 11:14:34 gary Exp $
+
+cmd=cmget
+if [ ".$1" = ".-w" ]; then
+	cmd=cmedit
+fi
+
+for j in `cmls -F`
+do
+  endch=`expr "$j" : '.*\(.\)$'`
+  #rest=`expr "$j" : '\(.*\).$'`
+  #echo j=$j
+  #echo endch=$endch
+  #echo rest=$rest
+  if [ "$endch" = "/" ]
+  then
+    mkdir -p $j
+    cd $j
+    getall $1
+    cd ..
+  else
+    $cmd $j
+  fi
+done

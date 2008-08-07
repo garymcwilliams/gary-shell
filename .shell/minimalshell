@@ -1,0 +1,30 @@
+#! /bin/bash
+#; minimalshell
+#; minimal environment needed to run commands
+
+SHELL=bash
+export SHELL
+
+# unset mail checking
+unset MAILCHECK
+
+#; Start with a basic PATH - then addon/override in aliases
+PATH="$PATH:/usr/bin:/usr/sbin:/bin:/sbin"
+export PATH
+
+#; Add in local directories, just for fun and convenience
+PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
+export PATH
+
+#; This will check the Operating System type and set the toolkit
+#; appropriately. I'm sick of re-porting my tools around. For anything
+#; that requires "special" tuning, create a seperate toolkit function
+#; for that distribution and set it up via the "case" statement below.
+UNAME="`uname -s`"
+export UNAME
+
+#; Check the node name and setup specifics based on that.
+NODENAME="`uname -n`"
+export NODENAME
+
+#; $Id: minimalshell,v 1.1 2003/10/15 09:06:18 gary Exp $

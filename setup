@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+# script to setup environment for use by cygwin
+#
+
+checkandrename()
+{
+	rename=n
+	# if it's not already a link
+	if [ -L .$1 ]
+	then
+		echo .$1 already exists:
+		ls -l .$1
+	else
+		# if the file exists, we need to rename it
+		if [ -f .$1 ]
+		then
+			# if the file we need to rename to exists, we cannot rename
+			if [ -f _$1 ]
+			then
+				echo file _$1 exists, cannot continue
+				exit
+			fi
+			rename=y
+		fi
+		# if the dir exists, we need to rename it
+		if [ -d .$1 ]
+		then
+			# if the file we need to rename to exists, we cannot rename
+			if [ -d _$1 ]
+			then
+				echo dir _$1 exists, cannot continue
+				exit
+			fi
+			rename=y
+		fi
+		if [ $rename = y ]
+		then
+			echo renaming .$1 to _$1
+			mv .$1 _$1
+		fi
+		echo linking .$1
+		ln -s $shelldir/.$1 .$1
+	fi
+}
+
+if [ ".$CVSWORKDIR" = "." ]
+then
+	echo No cvsroot set, cannot continue
+	echo export CVSWORKDIR=/cygdrive/X/projects/cvsroot \(or whatever\)
+	exit
+fi
+
+shelldir=$CVSWORKDIR/shell
+
+# assume that the shell module has been checked out into cvsroot
+if [ ! -d $shelldir ]
+then
+	echo the shell module must be checked out into
+	echo $shelldir
+fi
+
+cd
+echo Setting environment from $shelldir
+
+checkandrename bashrc
+checkandrename bash_profile
+checkandrename shell
+
+# check for tools_hostname and link that as tools
+host=`hostname`
+tools=tools
+toolsdir=$shelldir/tools_$host
+
+if [ ! -d $toolsdir ]
+then
+	echo the tools for this machine do not exist, creating
+	mkdir -p $toolsdir
+fi
+
+# if it's not already a link
+if [ -L $tools ]
+then
+	echo $tools already exists:
+	ls -l $tools
+else
+	rename=n
+	# if the dir exists, we need to rename it
+	if [ -d $tools ]
+	then
+		# if the file we need to rename to exists, we cannot rename
+		if [ -d _$tools ]
+			then
+			echo dir _$tools exists, cannot continue
+			exit
+		fi
+		rename=y
+	fi
+	if [ $rename = y ]
+	then
+		echo renaming $tools to _$tools
+		mv $tools _$tools
+	fi
+	echo linking $tools
+	ln -s $toolsdir $tools
+fi

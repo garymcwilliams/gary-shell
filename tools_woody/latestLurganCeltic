@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# script to export the latest LurganCeltic project website
+#
+
+#ver=f1latest
+#dbparms=Latest
+#wdir=/home/gary/cvsroot/FantsyF1/tools
+
+#$wdir/processFantsyF1 $ver $dbparms
+
+cd /var/www
+#export the latest web trunk
+svn export --force http://buzz/svn/lurganceltic/trunk/web lurganceltic

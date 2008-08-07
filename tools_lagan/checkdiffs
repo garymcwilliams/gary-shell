@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# script to cmdiff files and list those that do not currently exist within RCS
+#
+
+# does the RCS folder exist?
+rcs=/l/RCS
+pwd=`pwd`
+folder=`expr $pwd : "$PROJECT_BASE/\(.*\)"`
+#echo folder=$folder
+
+if [ -d $rcs/$folder ]; then
+	:
+else
+	echo "creating RCS repository $rcs/$folder"
+	mkdir -p $rcs/$folder
+fi
+
+for f in *.java
+do
+  cmdiff $f > $f.diff 2>&1
+done
+for f in *.sql
+do
+  cmdiff $f > $f.diff 2>&1
+done
+for f in *.xml
+do
+  cmdiff $f > $f.diff 2>&1
+done
+
+
+# create the file for piping into smcreate_latest
+grep -li "no such" *.diff > smcreate_temp
+sed s/.diff//g > smcreate < smcreate_temp
+cat smcreate
+rm smcreate_temp
+
+# $Id: checkdiffs,v 1.3 2004/09/10 12:26:42 gary Exp $

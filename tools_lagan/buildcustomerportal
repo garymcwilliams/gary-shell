@@ -1,0 +1,93 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+
+outputusage()
+{
+	echo "Usage: buildcustomerportal -v [4|5|5.0] [-c] [-l] [-o] [-p \"ARGS\"]"
+	echo "   buildcustomerportal will build the version of frontline"
+	echo "   -v4 : use frontline 4 build environment"
+	echo "   -v5 : use frontline 5 build environment"
+	echo "   -v5.0 : use frontline 5.0 build environment"
+	echo "   -c : clean the build destination before building"
+	echo "   -l : log the output (causes process to be run as background job)"
+	echo "   -o : Don't obfuscate"
+	echo "   -e : Build into the eclipse environment"
+	echo "   -p : pass on elements contained within \"ARGS\" to the buildcustomerportal process"
+	exit 2
+}
+
+
+usev=0
+clean=n
+log=n
+eclipse=n
+valid=1
+passthrough=
+obfuscate=
+
+OPTIND=1
+while getopts "v:celop:" Option
+do
+  case $Option in
+    c     ) clean=y;;
+    l     ) log=y;;
+    e     ) eclipse=y;;
+    v     ) usev=$OPTARG;;
+    o     ) obfuscate=-o;;
+    p     ) passthrough=$OPTARG;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $usev = "4" -o $usev = "5" -o $usev = "5.0" ]
+then
+	:
+else
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+
+echo "using Version $usev environment"
+if [ $eclipse = "y" ]
+then
+	. envbuild -v $usev -e
+else
+	. envbuild -v $usev
+fi
+
+# only clean up the standard build environment
+if [ $clean = "y" -a $eclipse = "n" ];
+then
+	cleanbuild -v $usev
+fi
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+
+if [ ! -f ./buildcustomerportal.ksh ];
+then
+  echo "could not find ./buildcustomerportal.ksh, you are not in correct directory"
+fi
+
+
+echo "build dir: $MY_BUILD_DIR"
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell
+if [ $log = "y" ];
+then
+	bash ./buildcustomerportal.ksh $obfuscate $passthrough > $MY_ROOT_DIR/buildcustomerportal.log 2>&1 &
+	echo logging to $MY_ROOT_DIR/buildcustomerportal.log
+	tail -f $MY_ROOT_DIR/buildcustomerportal.log
+else
+	bash ./buildcustomerportal.ksh $obfuscate $passthrough
+fi
+
+# $Id: buildcustomerportal,v 1.3 2004/12/15 17:47:15 gary Exp $

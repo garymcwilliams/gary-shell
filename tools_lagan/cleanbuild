@@ -1,0 +1,57 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+#; $Id: cleanbuild,v 1.5 2004/05/05 13:24:31 gary Exp $
+
+# Assumes that the Build env vars are correctly set!!!
+
+outputusage()
+{
+	echo "Usage: cleanbuild [-s]"
+	echo "   cleanbuild will clean out the build destination folder"
+	echo "   -s : clean the buildsource tree as well"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+
+cleansource=n
+valid=1
+
+while getopts ":s" Option
+do
+  case $Option in
+    s     ) cleansource=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $usev = "none" ]
+then
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+. envbuild
+
+if [ ${cleansource} = "y" ];
+then
+	echo "cleaning out source dir: $MY_ROOT_DIR"
+	rm -Rf $MY_ROOT_DIR/*
+
+	echo "creating build environment"
+	mkdir -p $MY_ROOT_DIR/projects
+fi
+
+echo "cleaning out build dir: $MY_BUILD_DIR"
+rm -Rf $MY_BUILD_DIR/*
+
+ls -l $MY_BUILD_DIR

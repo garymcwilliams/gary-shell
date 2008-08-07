@@ -1,0 +1,110 @@
+#!/bin/bash
+#
+# script to manager a patching of the build core
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` -v 4|5|5.0 [-d] [-p \"ProjectName\"] [-l]"
+	echo "   `basename $0` will patch the latest version of frontline"
+	echo "   -v4 : use frontline 4 build environment"
+	echo "   -v5 : use frontline 5 build environment"
+	echo "   -v5.0 : use frontline 5.0 build environment"
+	echo "   -d : use dev, rather than patch folder"
+	echo "   -p : Use the source from an eclipse project instead"
+	echo "   -l : log the output (causes process to be run as background job)"
+	exit 2
+}
+
+
+if [ $# -lt 1 ]
+then
+	outputusage
+fi
+
+usev=5
+log=n
+dev=n
+eclipseproj=
+useeclipseproj=n
+
+valid=1
+
+OPTIND=1
+while getopts "v:ldp:" Option
+do
+  case $Option in
+	  l     ) log=y;;
+	  v     ) usev=$OPTARG;;
+	  d     ) dev=y;;
+	  p     ) eclipseproj=$OPTARG;
+		      useeclipseproj=y;;
+	  *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $usev = "4" -o $usev = "5" -o $usev = "5.0" ]
+then
+	:
+else
+	valid=0
+fi
+
+# cannot use both -d & -p
+if [ $dev = y -a $useeclipseproj = y ]
+then
+	echo Cannot specify both -d and -p
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+echo "using Version $usev environment"
+. envbuild -v $usev
+
+if [ $useeclipseproj = y ]
+then
+	echo "getting source from eclipse project:$eclipseproj"
+fi
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+pwd
+
+if [ ! -f ./buildcore.ksh ];
+then
+  echo "could not find ./buildcore.ksh, you are not in correct directory"
+fi
+
+# reset root to be based off dev sources
+if [ $dev = y ]
+then
+	export MY_ROOT_DIR=d:/projects/frontline$usev/devsource
+else
+	export MY_ROOT_DIR=d:/projects/frontline$usev/patchsource
+fi
+if [ $useeclipseproj = y ]
+then
+	export MY_ROOT_DIR=d:/projects/cvsroot/workspace/$eclipseproj
+	if [ ! -d $MY_ROOT_DIR/projects/lagancentre ]
+	then
+		echo $MY_ROOT_DIR is not a valid build source structure
+		exit 3
+	fi
+fi
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell
+if [ $log = "y" ];
+then
+	bash buildcore.ksh -r $* > $MY_ROOT_DIR/buildpatch.log 2>&1 &
+	echo logging to $MY_ROOT_DIR/buildpatch.log
+	tail -f $MY_ROOT_DIR/buildpatch.log
+else
+	bash buildcore.ksh -r $*
+fi
+
+# $Id: buildpatch,v 1.5 2004/12/15 17:47:15 gary Exp $

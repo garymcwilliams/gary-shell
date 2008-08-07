@@ -1,0 +1,97 @@
+#!/usr/bin/perl -w
+use strict;
+use XML::Parser;
+use FileHandle;
+
+=head1 Usage
+
+svnbranchroot <branch>
+
+e.g. 
+
+ svnbranchroot .
+   or
+ svnbranchroot http://server/repos/branches/branch1
+
+Find the root of a branch. Takes one parameter - the branch, and finds
+the root revision of the branch - the revision from which it was
+made. Especially good for investigating tags. What revision of the
+parent branch was this tag made from?
+
+See the tip under "Merging a Whole Branch to Another"
+
+http://svnbook.red-bean.com/svnbook/book.html#svn-ch-4-sect-4.1
+
+for the procedure.
+
+Here it is automated.
+
+ Copyright 2004 Peter Morch
+ Released under the GPL
+
+=cut
+
+my $branch = $ARGV[0]
+  or die "Please supply a branch as in:\n$0 <branch>";
+
+my $parser = new XML::Parser(Style => 'Tree');
+
+# We only care about markup...
+$parser->setHandlers("Char",0);
+
+my $fh = new FileHandle;
+open I, "svn log -v --xml --stop-on-copy $branch |"
+  or die "Couldn't open svn log $branch";
+my $t = $parser->parse(*I);
+close I;
+
+my $lastRev = pop @{$$t[1]};
+my ($lrHash, %lrContents) = @$lastRev;
+
+# use lib '/opt/capmon/inc'; use Dbug ; dbugDump(\%lrContents);
+# prints something like:
+# DEBUG: $VAR1 = {
+#   'msg' => [
+#     {}
+#   ],
+#   'date' => [
+#     {}
+#   ],
+#   'author' => [
+#     {}
+#   ],
+#   'paths' => [
+#     {},
+#     'path',
+#     [
+#       {
+#         'copyfrom-path' => '/branches/complete/CAPMON_4',
+#         'action' => 'A',
+#         'copyfrom-rev' => '4372'
+#       }
+#     ]
+#   ]
+# };
+
+my $paths = $lrContents{paths};
+shift @$paths;
+my $copyfromRev;
+while (@$paths && ! defined $copyfromRev) {
+  (shift @$paths eq 'path')
+    or die "Huh? paths contains something other than a 'path'";
+  my $pathContents = shift @$paths;
+  $copyfromRev = $pathContents->[0]->{'copyfrom-rev'}
+    if ($pathContents->[0]->{'copyfrom-rev'});
+}
+
+# Well, if it isn't found that means the branch was created straight
+# under the root of the repository with no ancestry.
+die "No root was found for the branch\n"
+   unless $copyfromRev;
+
+# Print a newline if its a tty...
+if (-t STDOUT) {
+  print $copyfromRev . "\n";
+} else {
+  print $copyfromRev;
+}

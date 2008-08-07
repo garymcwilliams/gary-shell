@@ -1,0 +1,57 @@
+#!/bin/bash
+#; bashrc
+#; Local specific setup
+
+if [ -e ~/shell/.shell/local_lagan/bashrc ]; then
+  . ~/shell/.shell/local_lagan/bashrc
+fi
+
+#; Gary Added Java
+java=/d/java/j2sdk1.4.1_02
+#java=/d/java/j2sdk1.4.2_04
+JAVA_HOME=`cygpath --windows $java`
+# put java first to ensure we always pick up the defined one
+PATH="$java/bin:$PATH"
+export PATH JAVA_HOME
+
+#setup Frontline build
+#export MY_BUILD_DIR=/d/frontlinebuild
+export MY_BUILD_DIR=d:/frontlinebuild
+export MY_CD_DIR=/d/frontlinecd
+#export MY_EXTRA_LIBS=/d/frontlinebuild/lib
+export MY_EXTRA_LIBS=d:/frontlinebuildlib
+export MY_JDK_DIR=$java
+export MY_ROOT_DIR=/d
+export MY_WIN_PATH=`cygpath --unix --sysdir`
+#export MY_WIN_PATH=/c/winnt/system32
+
+export MY_BUILD_PREFIX=5-1-1-0
+
+
+function cmcomplete()
+{
+    if [ "$PROJECT_BASE" != "" ]
+    then
+	    cwd=`pwd`;
+	    left=`expr "$cwd" : "${PROJECT_BASE}\(.*\)"`
+	
+	    if [ "$left" != "" ]
+	    then
+
+            if [ "$2" != "" ]
+            then
+                list=`"ls" L:/RCS/$left | grep -e ^$2`
+            else
+                list=`"ls" L:/RCS/$left`
+            fi
+            
+            COMPREPLY=($list)
+	    fi
+    fi
+}
+
+complete -F cmcomplete cmget
+complete -F cmcomplete cmedit
+complete -F cmcomplete cminfo
+
+#; $Id: bashrc,v 1.3 2004/11/30 11:13:35 gary Exp $

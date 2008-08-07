@@ -1,0 +1,27 @@
+#!/bin/bash
+
+jarnamesx="
+ODMUtil
+ODMService
+ODMInterface
+ODMBeans
+"
+
+jarnames="
+Application
+ApplicationLoader
+Interface
+Service
+ServiceInterface
+Util
+"
+
+for jarname in $jarnames
+do
+  jar tf d:/projects/frontline5-1-2-beta6/frontlinebuild/${jarname}.jar > ~/tmp/${jarname}.orig
+  jar tf d:/projects/frontline5-1-2-beta6/frontlinebuild/${jarname}src.jar > ~/tmp/${jarname}.src
+  sort ~/tmp/${jarname}.orig > ~/tmp/${jarname}.orig.s
+  sort ~/tmp/${jarname}.src > ~/tmp/${jarname}.src.s
+
+  diff `cygpath --windows ~/tmp/${jarname}.orig.s` `cygpath --windows ~/tmp/${jarname}.new.s`
+done

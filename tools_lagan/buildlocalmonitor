@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+
+outputusage()
+{
+	echo "Usage: $0 -v [4|5|5.0] [-p \"ARGS\"]"
+	echo "   $0 will build the version of frontline"
+	echo "   -v5 : use frontline 5 build environment"
+	echo "   -p : pass on elements contained within \"ARGS\" to the buildlocalmonitor process"
+	exit 2
+}
+
+
+usev=0
+valid=1
+passthrough=
+
+OPTIND=1
+while getopts "v:p:" Option
+do
+  case $Option in
+    v     ) usev=$OPTARG;;
+    p     ) passthrough=$OPTARG;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+if [ $OPTIND -gt 1 ]; then
+	shift $(($OPTIND - 1))
+fi
+
+if [ $usev = "5" ]
+then
+	:
+else
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+echo "using Version $usev environment"
+. envbuild -v $usev
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+
+if [ ! -f ./buildlocalmonitor.ksh ];
+then
+  echo "could not find ./buildlocalmonitor.ksh, you are not in correct directory"
+fi
+
+
+echo "build dir: $MY_BUILD_DIR"
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell
+if [ $log = "y" ];
+then
+	bash ./buildlocalmonitor.ksh $passthrough > $MY_ROOT_DIR/buildlocalmonitor.log 2>&1 &
+	echo logging to $MY_ROOT_DIR/buildlocalmonitor.log
+	tail -f $MY_ROOT_DIR/buildlocalmonitor.log
+else
+	bash ./buildlocalmonitor.ksh $passthrough
+fi
+
+# $Id: buildlocalmonitor,v 1.3 2004/12/15 17:47:15 gary Exp $

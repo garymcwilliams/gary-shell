@@ -1,0 +1,153 @@
+#!/bin/bash
+#
+# script to work on set of files specified so that they can be
+# smput'd into RCS
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` -p PCC_number -v frontlineversion -m commit message [-w] [-g] filename..."
+	echo "   `basename $0` will commit files with the defined PCC number and message"
+	echo "   -g will perform a cmget on the file after the smput"
+	echo "   -w will make files writable if not already (used for CVS controlled dirs)"
+	echo "   if no -p is given then the PCC defined in the PCC env var is used"
+	echo "   -v allows the specification of the version string to be used"
+	echo "      if no -v is given then the version defined in the PCCVER env var is used"
+	exit 2
+}
+
+if [ $# -lt 3 ]
+then
+	outputusage
+fi
+
+typeset -i pid=$$
+case $pid in
+  -*) let pid=-$pid;;
+esac
+
+msg=""
+pcc=${PCC:-""}
+get=0
+valid=1
+ver=${PCCVER:-""}
+makewritable=n
+
+while getopts ":m:p:gwv:" Option
+do
+  case $Option in
+    m     ) msg=$OPTARG;;
+    p     ) case $OPTARG in
+		      PCC_[0-9][0-9][0-9][0-9][0-9])	pcc=$OPTARG;;
+		      PDF_[0-9][0-9][0-9][0-9][0-9])	pcc=$OPTARG;;
+		      UCC_[0-9][0-9][0-9][0-9][0-9])	pcc=$OPTARG;;
+		      UDF_[0-9][0-9][0-9][0-9][0-9])	pcc=$OPTARG;;
+     	      *)	                            valid=0;;
+          esac;;
+    g     ) get=1;;
+    w     ) makewritable=y;;
+    v     ) case $OPTARG in
+		      [0-9]\.[0-9]\.[0-9])	ver=$OPTARG;;
+		      [0-9]\.[0-9])			ver=$OPTARG;;
+     	      *)	                valid=0;;
+          esac;;
+    *     ) valid=0;;   # DEFAULT
+  esac
+done
+
+#echo msg=$msg
+echo pcc=$pcc
+echo ver=$ver
+#echo valid=$valid
+#exit
+
+if [ "x$pcc" = "x" ]; then
+	echo "you must specify a valid PCC number"
+	valid=0
+fi
+
+if [ "x$ver" = "x" ]; then
+	echo "you must specify a valid frontline version"
+	valid=0
+fi
+
+if [ $valid = 0 ]; then
+	echo "invalid option specified, please check"
+	outputusage
+fi
+
+shift $(($OPTIND - 1))
+
+
+# check that at least one filename is supplied after we strip off any options
+if [ $# -lt 1 ]
+then
+	outputusage
+fi
+
+if [ "x$msg" = "x" ]; then
+	rm -f ${pid}com.ent
+
+	while true
+    do
+	  echo "Comments (finish with line having just a dot):"
+	  got_a_line=0
+	  while true
+	  do
+		read -e comment_line
+        
+        if [ "$comment_line" = "." ]
+		then
+            break
+        fi
+        got_a_line=1
+        echo $comment_line >> ${pid}com.ent
+	  done
+	  if [ $got_a_line = 1 ]
+		  then
+		  break
+	  fi
+	  echo "?Must enter at least one line." >&2
+	done
+else
+    echo $msg >> ${pid}com.ent
+fi
+
+msg=`cat ${pid}com.ent`
+echo msg=$msg
+
+system_prefix=`expr "$pcc" : '\(.\)'`
+
+for f in $*
+do
+	if [ $makewritable = "y" ]; then
+		chmod +w $f
+	fi
+	if [ -w $f ]; then
+		:
+	else
+		echo "$f is not writable, please fix"
+		exit
+	fi
+	if [ "$system_prefix" = "P" ]; then
+	smput $f <<EOF
+$pcc
+$ver
+$msg
+.
+EOF
+	else
+	cmput $f <<EOF
+$pcc
+$msg
+.
+EOF
+	fi
+#	cmedit $f
+	if [ $get = 1 ]; then
+		cmget $f
+	fi
+done
+rm -f ${pid}com.ent
+
+# $Id: smput_latest,v 1.11 2005/02/07 10:52:17 gary Exp $

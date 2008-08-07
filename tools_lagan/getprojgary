@@ -1,0 +1,163 @@
+#!/bin/bash
+#//  getprojgary - determine project name, based on Gary's structure
+#//
+#//  Shell function library containing functions to identify the name
+#//  of the current project.
+#//  This is not a user-callable command.
+
+
+#// checking standard project locations
+frontlineversions="
+frontline4
+frontline5.0
+frontline5-1-1
+frontline5-1-2
+frontlineBDS
+"
+
+sourceprojects="
+devsource
+buildsource
+patchsource
+rcssource
+"
+
+#// checking standard cvs locations
+cvsroots="
+cvsroot
+"
+eclipseworkspaces="
+workspace
+"
+
+#// list of valid projects
+#// laganprojects="
+#// PullModel
+#// lagancentre
+#// laganutil
+#// fastlink_phase_3
+#// fastlink_phase_2
+#// bcc
+#// bristol
+#// stockport
+#// guernsey
+#// council
+#// telcodemo
+#// gallaher
+#// Banking_365
+#// news_speed
+#// gtm
+#// lagan
+#// intranet
+#// fastlink
+#// acc
+#// internal
+#// dantest
+#// support
+#// timesheet
+#// proof_of_concept
+#// ncc
+#// lg
+#// cygwintest
+#// "
+
+laganprojects="
+WorkingDays
+CaseTaskListsClient
+CaseTaskListsConfigClient
+CaseTaskListsNewConfig
+CaseTaskListsRCS
+CaseTaskListsServer
+CaseTaskListsUtil
+Transportable
+PullModel
+ODM
+lagancentre
+laganutil
+PortletUtil
+Portlets
+lagan
+cygwintest
+test
+"
+
+found=n
+projectbase=""
+
+function set_projectbase
+{
+	for fl in $frontlineversions
+	do
+		for src in $sourceprojects
+		do
+			if [ $found = "n" ]; then
+				checkroot="/d/projects/${fl}/${src}"
+    			if (am_under $checkroot)
+				then
+					projectbase=$checkroot/projects
+					found="y"
+					export PROJECT_NAME=$fl-$src
+				fi
+			fi
+		done
+	done
+
+	#// expect to find a cvs root tree under projects which is the common sandbox
+	if [ $found = "n" ]; then
+		for cvs in $cvsroots
+		do
+		  for wkspace in $eclipseworkspaces
+		  do
+			for prj in $laganprojects
+			do
+			  if [ $found = "n" ]; then
+				  checkroot="/d/projects/${cvs}/${wkspace}/${prj}"
+				  if (am_under $checkroot)
+				  then
+					  projectbase=$checkroot
+					  found="y"
+					  export PROJECT_NAME=$prj
+				  fi
+			  fi
+			done
+		  done
+		done
+	fi
+
+	if [ $found = "n" ]
+	then
+		checkroot="/l/Projects"
+		if (am_under $checkroot)
+		then
+			projectbase=$checkroot
+			found="y"
+			export PROJECT_NAME='L'
+		fi
+	fi
+
+	if [ .$projectbase = "." ]
+	then
+		echo Cannot determine PROJECT_BASE for `pwd`
+		return 0
+	else
+		export PROJECT_BASE=$projectbase
+		return 1
+	fi
+}
+
+function am_under
+{
+
+    typeset cwd=`pwd`
+    typeset root=$1
+    case `expr "$cwd" : "${root}"` in
+      0)
+        return 1
+        ;;
+      *)
+        return 0
+        ;;
+    esac    
+}
+
+# $Id: getprojgary,v 1.12 2004/09/10 12:26:42 gary Exp $

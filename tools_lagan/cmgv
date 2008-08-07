@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# wrapper to execute groovy cm utils
+
+outputusage()
+{
+	echo "Usage: `basename $0` groovy-script-name [script-param] ..."
+	echo "   `basename $0` will execute the given groovy script within a controller environment"
+	exit 2
+}
+
+
+if [ $# = 0 ]
+then
+	outputusage
+fi
+
+# must export these variable in local setup to point to correct location
+#groovy_scripts_dir=/d/projects/GroovyCMUtils/src/
+#third_party_libs=/d/projects/frontline-3rd-party-libs
+
+groovy_script_name=`cygpath --mixed $groovy_scripts_dir/$1`
+shift
+
+libs="
+classes12.zip
+"
+
+cp="."
+
+for lib in $libs
+do
+	cp="$cp:$third_party_libs/$lib"
+done
+
+classpath=`cygpath --mixed --path $cp`
+
+groovy -cp $classpath $groovy_script_name $*
+

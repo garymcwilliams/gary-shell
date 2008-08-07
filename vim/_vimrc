@@ -1,0 +1,71 @@
+set nocompatible
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+"   Set the location where files are backed up to.
+set backupdir=D:/temp/vimbackup
+"   Set the location of the swap file directory.
+set directory=D:/temp/vimbackup
+"   Set shiftwidth of 4 (used for indenting).
+set shiftwidth=4
+"   Set tabstop to 4.
+set tabstop=4
+"   Uses spaces instead of tabs.
+"set smarttab
+"   Backspace deletes as if tabs were used.
+set softtabstop=4
+"   Right aligned text is positioned to 98.
+set textwidth=98
+"   Turn word wrap off.
+"set nowrap
+"   set the number of lines of display to 45.
+set lines=45
+"   set the number of columns of display to 98.
+set columns=98
+  " Hide the mouse pointer while typing
+set mousehide
+
+" do not wrap lines
+set nowrap
+
+" use smart case searching. If you search lower-case, it is case insensitive. If you search
+" Upper-case, it it case sensitive
+set ignorecase smartcase
+
+"==============================================================================================
+"   Syntax
+"==============================================================================================
+
+"   Standard syntax highlighting.
+highlight Normal guibg=Black guifg=White
+highlight Comment guifg=Green
+highlight Constant guifg=Cyan
+highlight String guifg=Cyan
+highlight Keyword guifg=Yellow
+highlight Boolean gui=bold guifg=Cyan
+highlight Statement guifg=Yellow gui=bold
+highlight Type guifg=Yellow gui=bold
+highlight Tag gui=underline
+highlight Special gui=bold guifg=Green
+highlight Identifier guifg=LightYellow
+
+"   Set the selection color (is reversed).
+highlight Visual guifg=DarkBlue guibg=White
+
+set diffexpr=MyDiff()
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  silent execute '!D:\tools\Vim\vim63\diff ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+endfunction
+
+noremap <C-PageUp> :next!<CR>
+noremap <C-PageDown> :previous!<CR>

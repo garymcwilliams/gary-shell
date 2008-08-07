@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+# script to build the core cd
+#
+# NOTE that this script only works off an official 'release build'
+#
+# These are generally found on \\glenree. Copy the required release off glenree
+# into the 'releasebuild' folder (under appropriate project) and then run corecd
+# 
+# To build off a local installation, copy the contents of your correct
+# buildfolder (where buildcore puts the files) over the releasebuild and then run corecd
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` [-c]"
+	echo "   `basename $0` will create the cd for the version of frontline"
+	echo "   -c : clean the cd destination before building"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+clean=n
+log=n
+
+valid=1
+
+OPTIND=1
+while getopts "c" Option
+do
+  case $Option in
+    c     ) clean=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+echo "using Version $usev environment"
+. envbuild
+
+# override with corecd specifics
+#export MY_BUILD_DIR=$MY_CD_ROOT_DIR
+
+echo "build from dir: $MY_BUILD_DIR"
+echo "build cd into: $MY_CD_DIR"
+echo "building cd for version"
+cat $MY_ROOT_DIR/projects/lagancentre/build/frontline/build.manifest
+
+if [ $clean = "y" ];
+then
+	echo "cleaning out cd dir"
+	rm -Rf $MY_CD_DIR/*
+fi
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+
+if [ ! -f ./corecd.ksh ];
+then
+  echo "could not find ./corecd.ksh, you are not in correct directory"
+fi
+
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell_nocase
+bash ./corecd.ksh $*
+
+# $Id: corecd,v 1.6 2005/02/07 10:49:53 gary Exp $

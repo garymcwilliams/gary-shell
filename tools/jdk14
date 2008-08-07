@@ -1,0 +1,2 @@
+export JAVA_HOME=/cygdrive/d/j2sdk1.4.1_01
+export PATH=$JAVA_HOME/bin:$PATH

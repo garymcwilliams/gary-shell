@@ -1,0 +1,341 @@
+#! /bin/bash
+#//=====================================================================
+#//=====================================================================
+#//
+#//  <html><head><title>cmput</title>
+#//  <link href="mailto:colin@lagan.com"></head><body>
+#//  Lagan Technologies Ltd - <a href="index.htm">Development Tools</a>
+#//  <hr>
+#//
+#//  <h2>NAME</h2>
+#//  cmput - put source file back into RCS after editing
+#//
+#//  <h2>SYNOPSIS</h2>
+#//  <kbd>cmput [-r</kbd> <i>rev-num</i><kbd>]</kbd> <i>file-name</i><br>
+#//  <kbd>cmput [-r</kbd> <i>rev-num</i><kbd>]</kbd> <i>absolute-path</i>
+#//
+#//  <h2>DESCRIPTION</h2>
+#//  <b>cmput</b> will put a copy of the specified source file into RCS.
+#//  The file must be writable and must be in the current working directory.
+#//  <b>cmput</b> will remove the file from the current working directory
+#//  after successfully putting the file into RCS.  The file may be retrieved
+#//  subsequently for read-only use by <a href="cmget.htm">cmget</a>, or
+#//  for editing by <a href="cmedit.htm">cmedit</a>.
+#//  <p>
+#//  The file must have been retrieved previously from RCS
+#//  with <a href="cmedit.htm">cmedit</a>. <b>cmput</b> will remove the
+#//  RCS lock placed on the file by <a href="cmedit.htm">cmedit</a>.
+#//  <p>
+#//  <b>cmput</b> gives the file a new revision number of 1 greater than
+#//  the revision number retrieved by the prior <a href="cmedit.htm">cmedit</a>,
+#//  unless a revision number is given to <b>cmput</b> by the <b>-r</b> 
+#//  option, in which case the specified revision number is used.
+#//  <p>
+#//  <b>cmput</b> will prompt for a Change Request Number to be entered.
+#//  If more than one Change Request applies then a comma can be used
+#//  to separate the numbers.  Eg.
+#//  <blockquote>
+#//  0023,0027
+#//  </blockquote>
+#//  <p>
+#//  <b>cmput</b> will prompt for comments on the new revision.  More than
+#//  one line of comments may be entered.  A line containing just a dot
+#//  indicates that there are no more comment lines.
+#//  <p>
+#//  The current directory must be inside a PROJECT_WORK_HOME hierarchy
+#//  for some project, for this command to determine the project to
+#//  work with.
+#//  <p>
+#//  If the source file is specified as just a file name <i>file-name</i> 
+#//  with no directories then <b>cmput</b> will take the the relative path of
+#//  the source file from PROJECT_CM_HOME to be the same as the relative
+#//  path of the source file in the current working directory from
+#//  PROJECT_WORK_HOME.
+#//  <p>
+#//  If the source file is specified as an absolute path 
+#//  <i>absolute-path</i> with a leading / then this is taken to be the
+#//  relative path (perversely) of the source file from PROJECT_CM_HOME.
+#//  <p>
+#//  If there are any errors a message will be written to the standard 
+#//  error and the command will exit with failure status 1.
+#//
+#//  <h2>REVISION HISTORY</h2>
+#//  <br>cmput.sh
+#//  <br>Revision 1.2  1997/12/19 21:29:29  colin
+#//  <br>Do not use temporary files for sed commands.
+#//  <br>Work around MKS -ve pid bug.
+#//  <br>
+#//  <br>Revision 1.1  1996/11/12 16:26:53  mme
+#//  <br>Initial revision
+#//  <br>
+#//
+#//  <hr>
+#//  <address>Colin Chambers, <a href="mailto:colin@lagan.com">colin@lagan.com</a>
+#//  </address><p>
+#//  Ref: [/export/home/RCS/lagan/cm/cmput.sh] V1.2<br>
+#//  &copy; 1996 Lagan Technologies Ltd.
+#//  </body></html>
+#//
+#//=====================================================================
+#//=====================================================================
+
+echo Running Gary debug cmput_dbg
+
+. cmstdfun
+
+usage="?usage: cmput [-p] [-r rev-num] file"
+
+typeset -i pid=$$
+case $pid in
+  -*) let pid=-$pid;;
+esac
+
+legal_options="r:p"
+
+parse_command "$usage" "$legal_options" "$0" "$@"
+
+if [ -w $file_base_name ]
+then
+    :
+else
+    if [ -r $file_base_name ]
+    then
+        echo "cmput: ?$file_base_name is not writable" >&2
+        exit 1
+    else
+        echo "cmput: ?No writable $file_base_name exists" >&2
+        exit 1
+    fi
+fi
+
+# check appropriate usage
+if [ $product_release_required = 1 ]
+then
+	if (am_under $PROJECT_BASE/laganutil)
+	then
+		echo Please use cmput instead of smput when in the laganutil package
+		exit 1
+	fi
+fi
+
+while true
+do
+	echo "Change Request Number(s): "
+    
+    if [ "$LAGAN_SHELL_TYPE" = "CYGWIN_BASH" ]
+    then
+        read -e tmp
+    elif [ "$LAGAN_SHELL_TYPE" = "MKS_KORN" ]
+    then
+        read tmp
+    fi
+    change_request_number=`echo $tmp | sed "s/ //g"`
+    if [ "$change_request_number" != "" ]
+    then
+        break
+    fi
+    echo "?Must not be blank." >&2
+done
+
+# multiple numbers may be supplied, verify each one
+for pcc in $tmp
+do
+# extract system from first char of change control number
+  system_prefix=`expr "$pcc" : '\(.\)'`
+  
+# do we need to check the system? note that only U* & P* need checked, thus pcc '0' is ok
+  check_system=0
+# is the change control id valid for the system?
+  valid_id=1
+  case $system_prefix in
+	  U) check_system=1;
+		  test="laganutil";
+		  case $pcc in
+		      UCC_[0-9][0-9][0-9][0-9][0-9])	;;
+              UDF_[0-9][0-9][0-9][0-9][0-9])	;;
+     	      *)	                            valid_id=0;;
+		  esac;;
+	  P) check_system=1;
+		  test="lagancentre";
+		  case $pcc in
+		      PCC_[0-9][0-9][0-9][0-9][0-9])	;;
+		      PDF_[0-9][0-9][0-9][0-9][0-9])	;;
+     	      *)	                            valid_id=0;;
+		  esac;;
+  esac
+
+  if [ $valid_id = 0 ]; then
+	  echo "change control number $pcc is not a valid change control number"
+	  exit 1
+  fi
+
+  valid_system=1
+  # TEST THIS instead of all these individual matches
+  # cursys=`expr "$full_path" : ".*/\(.*\)/\(code|config|build\)/.*"`
+  if [ $check_system = 1 ]; then
+  	cursys=`expr "$full_path" : ".*/\(.*\)/code/.*"`
+	if [ ! $cursys = 0 ]; then
+		current_system=`expr "$full_path" : ".*/\(.*\)/code/.*"`
+	else
+	  	cursys=`expr "$full_path" : ".*/\(.*\)/config/.*"`
+		if [ ! $cursys = 0 ]; then
+			current_system=`expr "$full_path" : ".*/\(.*\)/build/.*"`
+		else
+			cursys=`expr "$full_path" : ".*/\(.*\)/build/.*"`
+			if [ ! $cursys = 0 ]; then
+				current_system=`expr "$full_path" : ".*/\(.*\)/build/.*"`
+			fi
+		fi
+	fi
+	code=`expr "$full_path" : ".*/${test}/code/.*"`
+	config=`expr "$full_path" : ".*/${test}/config/.*"`
+	build=`expr "$full_path" : ".*/${test}/build/.*"`
+	if [ $code = 0 -a $config = 0 -a $build = 0 ]; then
+#	case `expr "$full_path" : ".*/${test}/[code|config]/.*"` in
+#	 0)
+	  valid_system=0
+#	  ;;
+#	 *)
+#	  ;;
+#	esac
+	fi
+  fi
+  
+  if [ $valid_system = 0 ]; then
+	  echo "You cannot apply change request number $pcc to the $current_system tree"
+	  exit 1
+  fi
+done
+
+rm -f ${pid}txt.ent
+
+if [ ! $product_release_required = 0 ]
+then
+    . smvldbld
+    echo "Product_Release: $bld_ver" >> ${pid}txt.ent
+	if [ -f ${pid}txt.ent ]; then
+		echo DBG Added to ${pid}txt.ent
+	else
+		echo DBG Could not create ${pid}txt.ent
+	fi
+fi
+
+while true
+do
+    echo "Comments (finish with line having just a dot):"
+    got_a_line=0
+    while true
+    do
+        if [ "$LAGAN_SHELL_TYPE" = "CYGWIN_BASH" ]
+        then
+            read -e comment_line
+        elif [ "$LAGAN_SHELL_TYPE" = "MKS_KORN" ]
+        then
+            read comment_line
+        fi
+        
+        if [ "$comment_line" = "." ]
+        then
+			echo DBG end of comments checking ent file
+			if [ -f ${pid}txt.ent ]; then
+				echo DBG ${pid}txt.ent still exists contents
+				cat ${pid}txt.ent
+			else
+				echo DBG ${pid}txt.ent no longer exist
+			fi
+            break
+        fi
+        got_a_line=1
+        echo $comment_line >> ${pid}txt.ent
+        echo DBG comments$comment_line added to ${pid}txt.ent
+		if [ -f ${pid}txt.ent ]; then
+			echo DBG `pwd` ${pid}txt.ent exists contents
+			cat ${pid}txt.ent
+		else
+			echo DBG ${pid}txt.ent does not exist
+		fi
+    done
+    if [ $got_a_line = 1 ]
+    then
+        break
+    fi
+    echo "?Must enter at least one line." >&2
+done
+
+echo DBG after comments processed
+if [ -f ${pid}txt.ent ]; then
+	echo DBG ${pid}txt.ent still exists contents
+	cat ${pid}txt.ent
+else
+	echo DBG ${pid}txt.ent does not exist now
+fi
+
+if [ "$requested_revision" = "" ]
+then
+    ropt=""
+else
+    ropt="-r$requested_revision"
+fi
+
+state=$change_request_number/$edit_level
+
+lock_log_file
+
+# This PATH setting is to ensure that the diff.exe invoked by ci.exe
+# is the one in the same directory as ci.exe.
+# Use of the diff.exe supplied by MKS is of no use as some option (-an)
+# is supplied, and this is not supprted by the MKS version.
+
+if [ $LAGAN_SHELL_TYPE == "CYGWIN_BASH" ] 
+then
+    cidir=`type -p ci`
+    ciloc=`expr "$cidir" : '\(.*\)/'`
+    PATH="${ciloc}:$PATH"
+elif [ $LAGAN_SHELL_TYPE == "MKS_KORN" ] 
+then
+    cidir=`whence ci`
+    ciloc=`expr "$cidir" : '\(.*\)/'`
+    PATH="${ciloc};$PATH"
+else
+    echo "cmput: ?LAGAN_SHELL_TYPE is undefined" >&2
+    echo "       Please export LAGAN_SHELL_TYPE as either \"CYGWIN_BASH\" or \"MKS_KORN\"" >&2
+    exit 1
+fi
+
+#echo DBG checking ent file for checkin
+
+#if [ -f ${pid}txt.ent ]; then
+#	echo "${pid}txt.ent exists - contents:"
+#	cat ${pid}txt.ent
+#else
+#	echo ${pid}txt.ent does not exist at checkin time
+#fi
+if ci $ropt -j -f -s$state $full_path < ${pid}txt.ent > ${pid}cmp.utt 2>&1
+then
+    cat ${pid}cmp.utt
+    put_revision=`sed -n 's/^new revision: \([^;]*\);.*/\1/p' < ${pid}cmp.utt`
+    rm ${pid}cmp.utt
+else
+    cat ${pid}cmp.utt >&2
+    rm ${pid}txt.ent ${pid}cmp.utt    
+    unlock_log_file
+    exit 1
+fi
+
+log_basic_stuff
+
+cat <<- EOF >> $PROJECT_CM_LOG
+	revision:$put_revision
+	change_request_number:$change_request_number
+	comments:>>>
+	`cat ${pid}txt.ent`
+	<<<
+EOF
+
+rm ${pid}txt.ent
+
+unlock_log_file
+
+exit 0
+
+

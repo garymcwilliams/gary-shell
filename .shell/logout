@@ -1,0 +1,16 @@
+#!/bin/sh
+#; logout
+#; Run on logout of shell.
+#; <eric@catastrophe.net> || <http://users.catastrophe.net/~eric/>
+
+
+#; Clear the screen on logout.
+clear
+
+#; If sudo exists, clear our tickets.
+if (type sudo &>/dev/null); then
+ sudo -k 2>/dev/null
+fi
+
+#; $Id: logout,v 1.1 2003/05/29 17:43:04 gary Exp $
+

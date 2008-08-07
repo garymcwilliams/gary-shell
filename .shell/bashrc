@@ -1,0 +1,82 @@
+#!/bin/bash
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+#echo in bashrc
+#date
+
+# If not running interactively, don't do anything:
+[ -z "$PS1" ] && return
+
+SHELL=bash
+export SHELL
+
+# don't put duplicate lines in the history. See bash(1) for more options
+#export HISTCONTROL=ignoredups
+
+# make cygwin case insensitive
+#shopt -s nocaseglob
+
+# are we running under cygwin
+type cygpath > /dev/null 2>&1
+cygwin="$?"
+
+if [ $cygwin = 0 ]; then
+    # convert the initial windows path (replacing space-filled names e.g. Program Files as necessary)
+    #export PATHWIN=$PATH
+	echo "path"
+    PATH=`cygpath --mixed --path --short-name "$PATH" | xargs cygpath --unix --path`
+    #export PATHORIG=$PATH
+    #; Start with a basic PATH - then addon/override in aliases
+    PATH="$PATH:/usr/sbin:/bin:/sbin"
+	#else just take the path as configured
+fi
+
+# unset mail checking
+unset MAILCHECK
+
+#; Localised configuration
+if [ -f ${HOME}/shell/.shell/local_$NODENAME/bashrc ]; then
+      . ${HOME}/shell/.shell/local_$NODENAME/bashrc
+fi
+
+export PATH
+
+#; Add in local directories, just for fun and convenience
+PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
+export PATH
+
+#; Setup a safe $TMP dir
+if [ -d "${HOME}/tmp" ]; then
+ TMP="${HOME}/tmp"
+ TMPDIR="${HOME}/tmp"
+ export TMP TMPDIR
+else
+ mkdir ${HOME}/tmp
+ chmod 700 ${HOME}/tmp
+ TMP="${HOME}/tmp"
+ TMPDIR="${HOME}/tmp"
+ export TMP TMPDIR
+ echo " ! $TMP was created."
+fi
+
+export LOGNAME=gary_mcwilliams
+
+if [ -d ~/shell/tools ]; then
+  PATH="~/shell/tools:$PATH"
+  if [ -e ~/shell/tools/envmsvc ]; then
+      . ~/shell/tools/envmsvc
+  fi
+fi
+
+if [ -d ~/shell/tools_$NODENAME ]; then
+	PATH="~/shell/tools_$NODENAME:$PATH"
+fi
+
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    eval "`dircolors -b`"
+fi
+
+#; $Id: bashrc,v 1.13 2004/11/30 11:13:34 gary Exp $

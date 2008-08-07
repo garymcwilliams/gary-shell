@@ -1,0 +1,4 @@
+# no l drive means no rcs, so don't bother
+#BIN_RCS="/d/tools/lagan/rcsbin"
+export MY_RESOURCE_DIR=/D/projects/frontline/frontline-3rd-party-libs
+export MY_PROGUARD_DIR="d:/tools/proguard2.1/lib"

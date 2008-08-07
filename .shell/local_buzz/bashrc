@@ -1,0 +1,31 @@
+#! /bin/bash
+#; bashrc
+#; Local specific setup
+
+# Delete
+bind '"\e[3~": delete-char'
+# Insert
+bind '"\e[2~": paste-from-clipboard' 
+# Home
+bind '"\M-[1~": beginning-of-line'
+# End
+bind '"\M-[4~": end-of-line'
+
+#; Setup the default CVS location.
+CVSDEFAULTROOT="/home/cvs/CVSROOT"
+export CVSDEFAULTROOT
+
+CVSROOT="${CVSDEFAULTROOT}"
+export CVSROOT
+
+#; Gary Added Java
+JAVA_HOME=/usr/local/j2re1.4.2_04
+PATH="$JAVA_HOME/bin:$PATH"
+export PATH JAVA_HOME
+
+
+PATH="$PATH:~/tools"
+
+# for subversion
+umask 002
+

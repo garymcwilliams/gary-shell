@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# script will find next file in directory and perform a cmdiff on it
+
+file=`ls -1 | grep -v "CVS" | head -1`
+
+cmdiff $file
+
+echo -n "commit? "
+read commit
+
+if [ $commit = "y" ]; then
+	smput_latest -p PCC_00777 -v 5.1.3 -m "implemented working days" -w $file
+fi
+

@@ -1,0 +1,19 @@
+#! /bin/bash
+#; buildshell
+#; Setup environment for building frontline
+
+
+if [ -r ~/.shell/minimalshell ]; then
+ . ~/.shell/minimalshell
+fi
+
+# use function to ensure that cygwin forces a copy
+export COPY=`type -P cp`
+cp ()
+{
+	$COPY -f $*
+}
+
+shopt -s nocaseglob
+
+#; $Id: buildshell_nocase,v 1.1 2003/12/12 16:34:12 gary Exp $

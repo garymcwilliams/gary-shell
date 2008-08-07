@@ -1,0 +1,33 @@
+#!/bin/bash
+###!/bin/bash -x
+
+
+inst_dir=`cygpath --unix D:/lagan/frontline`
+INSTALL_DIR=${MY_INSTALL_DIR:-$inst_dir}
+JAVA_BIN=`cygpath --unix $JAVA_HOME/bin`
+SERVER_NAME=${MY_SERVER_NAME:-"shannon"}
+POLICY=`cygpath --mixed $INSTALL_DIR`/config/policy
+CONFIG_URL=${MY_CONFIG_URL:="http://$SERVER_NAME/frontline/config"}
+
+cd $INSTALL_DIR/log
+
+JARS="
+Application.jar
+Util.jar
+Interface.jar
+"
+
+cp=".."
+
+for jar in $JARS
+do
+	jarpath=`cygpath --unix $INSTALL_DIR/classes/$jar`
+	cp=$cp:$jarpath
+done
+
+CP=`cygpath --mixed --path $cp`
+
+PATH=$JAVA_BIN:$INSTALL_DIR/bin
+
+$JAVA_BIN/java -cp $CP -Djava.security.policy=$POLICY com.lagan.lagancentre.core.coreapplication.Frontline
+# $CONFIG_URL

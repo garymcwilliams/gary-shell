@@ -1,0 +1,27 @@
+#!/bin/sh
+#; $HOME/.shell/aliases
+#; Portable aliases that can be used on a variety of machines.
+#; <eric@catastrophe.net> || <http://users.catastrophe.net/~eric/>
+
+#echo in ~/.shell/aliases
+#date
+
+#; Setup the SSH auth socket for the SSH agent.
+SSHDIR="${HOME}/.ssh"
+SSH_AUTH_SOCK="${SSHDIR}/.ssh-agent-socket"
+export SSHDIR SSH_AUTH_SOCK
+
+#; Small aliases.
+alias trace="traceroute -n"
+alias cls="clear"
+alias more="${PAGER}"
+
+# Gary specific
+alias ls='ls --color=auto --classify'
+alias ll='ls -l'
+alias cp='cp -i '
+alias mv='mv -i '
+alias rm='rm -i '
+alias which='type -p '
+
+#; $Id: aliases,v 1.3 2003/06/06 13:43:49 gary Exp $

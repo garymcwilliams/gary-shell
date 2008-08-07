@@ -1,0 +1,196 @@
+#!/bin/bash
+#
+# wrapper script for getcore.ksh
+#
+
+# Assumes that the Build env vars are correctly set!!!
+
+outputusage()
+{
+	echo "Usage: $0 builddir [-u] [-c[-s]] [-j] [-l] [-i]"
+	echo "   builddir is the directory where the build text files reside"
+	echo "     The builddir is matched, so it is possible to enter 5-1-2-001 to get"
+	echo "      the latest version of that build"
+	echo "   The script will also set the correct RCS environment for the build"
+	echo "     The frontline version is taken from first char of builddir"
+	echo "   -u : update only (retrieves only updated sources)"
+	echo "   -c : do not clean out the build destination folder"
+	echo "     -s : do not clean out the build source folder"
+	echo "   -j : pass on -j to getcore so that only Java sources are obtained"
+	echo "   -l : do *not* log the output"
+	echo "   -i : get and increment a build number"
+	exit 2
+}
+
+cleanupUpdate()
+{
+	cd $datearg
+	
+	cd ..
+}
+
+
+if [ $# -lt 1 ]
+then
+	outputusage
+fi
+
+LAGAN_CENTRE=/Projects/lagancentre
+LAGAN_UTIL=/Projects/laganutil
+
+cd L:${LAGAN_CENTRE}/build/frontline/ 
+
+datearg=$1
+shift
+if [ "${datearg}" = "" ]
+then
+	outputusage
+fi
+
+# extract version from first char of datearg
+vermajor=`expr "$datearg" : '\(.\)'`
+# ver4 not supported
+if [ "$vermajor" = "4" ]; then
+	echo "version4 not supported by this script!"
+	exit
+fi
+
+# find latest version matching as much of datearg as specified
+folderpattern="[[:digit:]]-[[:digit:]]-[[:digit:]].*"
+
+datearg=`ls -1d ${datearg}* | grep $folderpattern | tail -1`
+
+version=`expr "$datearg" : '\(...........\)'`
+vermajor=`echo $version | cut -d- -f1`
+verrelse=`echo $version | cut -d- -f2`
+verminor=`echo $version | cut -d- -f3`
+verbuild=`echo $version | cut -d- -f4`
+#echo majr=$vermajor
+#echo minr=$verminor
+
+echo buildfolder is ${datearg}
+
+# decide correct version setting
+usev=$vermajor-$verrelse-$verminor-$verbuild
+
+# the executed scripts work off an env var. so we need to set that now
+export FLVER=$usev
+
+#usev=`expr "$datearg" : '\(.\)'`
+#echo usev=$usev
+#echo FLVER=$FLVER
+
+updateonly=n
+# set these to 'n; as a safety option; we don't want to remove any in-development
+# resources by mistake
+docleandest=n
+docleansource=n
+getcoreopts=""
+log=y
+getbuildid=n
+
+OPTIND=1
+while getopts "ucsjli" Option
+do
+  case $Option in
+    u     ) updateonly=y;;
+    c     ) docleandest=y;;
+    s     ) docleansource=y;;
+    j     ) getcoreopts="-j";;
+    l     ) log=n;;
+	i     ) getbuildid=y;;
+    *     ) valid=0;;   # DEFAULT
+  esac
+done
+
+if [ $OPTIND -gt 1 ]; then
+	shift $(($OPTIND - 1))
+fi
+
+if [ ! -d $datearg ]
+then
+	echo Build folder:$datearg does not exist
+	exit 1
+fi
+
+# decide whether to get a build id or not
+getcore=getcore.ksh
+#getcore=getcore_dbg.ksh
+if [ "$getbuildid" = "n" ]
+then
+	getcore=getcore_nobuildid.ksh
+	echo "========================================================="
+	echo "not getting buildid, do *NOT* use this for a release build"
+	echo "========================================================="
+fi
+
+if [ ! -f ./$getcore ];
+then
+  echo could not find `pwd`/$getcore, you are not in correct directory
+  exit 1
+fi
+
+echo "using Version $FLVER environment"
+. envbuild
+# setup rcs environment, for a build source
+. setrcs -b
+
+#export PROJECT_BASE="/d/projects/frontline${usev}/buildsource/projects"
+#rcs${usev}build
+
+cleanbuildopts=
+if [ ${docleansource} = "y" ];
+then
+    echo "clean source"
+	docleandest=y
+	cleanbuildopts="-s"
+else
+	echo "not cleaning original source"
+fi
+
+if [ $docleandest = "y" ];
+then
+	echo "cleaning output"
+	cleanbuild $cleanbuildopts
+else
+	echo "not cleaning output folder"
+fi
+
+if [ ${updateonly} = "y" ];
+then
+	echo "clean update over-rides other settings"
+#	cleanupUpdate
+	getcoreopts="${getcoreopts} -u"
+fi
+
+echo "putting code into dir: $MY_ROOT_DIR"
+# record which build this is, in the build folder itself
+touch $MY_ROOT_DIR/$datearg
+
+# setup BASH/CYGWIN specifics
+alias cp='cp -f '
+alias mv='mv -f '
+
+echo "getting core using:"
+echo "rcs project is $PROJECT_BASE"
+myrootdir=`cygpath --unix $MY_ROOT_DIR`
+mycommand="./$getcore ${datearg} ${getcoreopts} -r $myrootdir $*"
+#echo ./getcore.ksh ${datearg} ${getcoreopts} -r $myrootdir $*
+echo $mycommand
+
+if [ $log = "y" ];
+then
+	echo logging to $myrootdir/getcore.log
+	$mycommand > $myrootdir/getcore.log 2>&1
+	grep -i writable $myrootdir/getcore.log
+else
+	$mycommand
+fi
+
+# having got all core, remove the unused elements
+clearbuild
+
+# and remove the old intermediate patch elements
+cleanpatch
+
+# $Id: getcore,v 1.17 2005/02/07 10:51:39 gary Exp $

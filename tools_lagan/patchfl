@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+# script to get the latest code for given PCC numbers into the patch folder
+#
+#; $Id: patchfl,v 1.9 2004/12/22 08:58:46 gary Exp $
+
+outputusage()
+{
+	echo "Usage: `basename $0` [-b] PCC_number ..."
+#	echo "Usage: `basename $0` [-d] PCC_number ..."
+	echo "   `basename $0` will patch the local frontline copy"
+#	echo "     by default the sourcepatch folder is patched"
+#	echo "     if -d is specified the dev folder is patched"
+	echo "     if -b is specified the build folder is patched. NOTE that -b should"
+	echo "		only be used from within a build environment, not from a dev environment"
+	exit 2
+}
+
+
+if [ $# -lt 1 ]
+then
+	outputusage
+fi
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+usebuild=n
+valid=1
+
+OPTIND=1
+while getopts "b" Option
+do
+  case $Option in
+    b     ) usebuild=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+
+flsetdiropts="-p"
+
+#if [ "$usedev" = "n" ]; then
+#	flsetdiropts="-b"
+#fi
+if [ "$usebuild" = "y" ]; then
+	flsetdiropts="-b"
+fi
+
+. flsetdir $flsetdiropts $vermajor-$verrelse-$verminor
+
+# adjust if necessary
+#if [ "$usedev" = "n" ]; then
+	# we are in build dir, change to patchdir
+#	cd ../../sourcepatch/projects
+#	. setrcs -c
+#fi
+
+PRJS="lagancentre
+laganutil"
+
+for prj in $PRJS
+do
+  if [ -f ${prj}_sources ]; then
+	  :
+  else
+	  touch ${prj}_sources
+  fi
+done
+
+for pcc in $*
+do
+	echo establishing change: $pcc
+	pccbase=`expr "$pcc" : '\(.\)'`
+	if [ $pccbase = 'P' ]; then
+		prj=lagancentre
+	else
+		prj=laganutil
+	fi
+
+	# gather up list of pccs
+	echo $pcc >> pccs
+	sort -u pccs > pcc
+	mv -f pcc pccs
+
+	# gather list of pcc sources, sort em, merge em with the source list, get the latest
+	# version for duplicate items, save it as the new set of sources
+	# echo changes to user
+	cmlscc $pcc $prj | sort
+	# merge changes
+	cmlscc $pcc $prj | sort | sort -m - ${prj}_sources | mrglist > ${prj}_sources_new
+	mv -f ${prj}_sources_new ${prj}_sources
+done
+
+# get the latest files
+for prj in $PRJS
+do
+  cd $prj
+  echo getting all patches for $prj
+  cat ../${prj}_sources | cmgetproj
+  cd ..
+done

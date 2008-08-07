@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# script to resursively find source files and check for lockers
+#
+
+for j in `ls -F`
+do
+  endch=`expr "$j" : '.*\(.\)$'`
+  suffix=`expr "$j" : '.*\.\(.*\)$'`
+  #rest=`expr "$j" : '\(.*\).$'`
+  #echo j=$j
+  #echo endch=$endch
+  #echo rest=$rest
+  # ignore un-needed files
+  if [ "$endch" = "/" ]
+  then
+	# ignore project work folders folders
+	  if [ $j = "CVS/" ]; then
+		  :
+	  elif [ $j = "bin/" ]; then
+		  :
+	  elif [ $j = "temp/" ]; then
+		  :
+	  else
+		  cd $j
+		  `basename $0` $1
+		  cd ..
+	  fi
+  else
+	# ignore working files
+	  lastch=`expr "$j" : '.*\(.\)$'`
+	  if [ "$suffix" = "log" ]; then
+		  :
+	  elif [ $lastch = "~" ]; then
+		  :
+	  elif [ $lastch = "#" ]; then
+		  :
+	  else
+#		if [ $j -nt $dest/$j ]; then
+		  cminfo $j 2>/dev/null | grep "locked by" >/dev/null
+		  locked=$?
+		  if [ "$locked" = "0" ]; then
+			  echo $j `cminfo $j | grep "locked by" | tr "[:blank:]" " " | cut -d" " -f2-`
+#		make this an option rather than default (e.g. -n show non-locked)
+		  else
+		  	  echo $j not locked
+		  fi
+#		else
+#			echo "  " ignoring $j
+#		fi
+	  fi
+  fi
+done

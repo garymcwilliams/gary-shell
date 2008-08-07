@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# Script to backup my local stuff
+#
+# $Id$
+
+logfile=/d/backup_`date +%Y%m%d`.log
+
+echo Starting `date` >> $logfile
+bk_location=/h/lagan/backup
+if [ ! -d $bk_location ]; then
+	echo cannot find $bk_location
+	echo cannot find $bk_location >> $logfile
+fi
+
+#################################
+# backup my SVN repo
+#################################
+bk_name=/d/maigue_svnrepos.tar.gz
+cd /d/svnrepos
+echo backing up svn
+echo backing up svn >> $logfile
+tar -czvf $bk_name *
+echo storing on h
+ls -l $bk_name >> $logfile
+echo storing on h >> $logfile
+mv $bk_name $bk_location
+
+
+#################################
+# backup my documents
+#################################
+bk_name=/d/maigue_mydocuments.tar.gz
+bk_lst=/d/maigue_mydocuments.lst
+cd /d/Personal/My\ Documents
+echo backing up my documents
+echo backing up my documents >> $logfile
+find . -type f -not \( -name "*~" -or -wholename "*/My\ Music/*" -or -wholename "*/Sports\ Interactive/*" \) -print > $bk_lst
+echo creating tar file
+echo creating tar file >> $logfile
+tar -czvf $bk_name --files-from $bk_lst
+echo storing on h
+ls -l $bk_name >> $logfile
+echo storing on h >> $logfile
+mv $bk_name $bk_location
+
+
+
+#################################
+# backup local code
+#################################
+
+# 1. d:\projects
+bk_name=/d/maigue_code_proj.tar.gz
+bk_lst=/d/backup_proj.lst
+echo backing up code
+echo backing up code >> $logfile
+
+# tidyup where available
+echo tidyup
+echo tidyup >> $logfile
+cd /d/projects/frontline/5-1-2-dev/sourcedev
+ant -f buildsvn.xml clean
+
+
+cd /d/projects
+#tar cvf /d/maigue_code.tar `find . -type f -not \( -name "*.exe" -or -name "*.class" -or -name "*.jar" -or -name "*.zip" -or -wholename "*\.svn*" -or -name "*\.log*" -or -wholename "*sourcebuild*" -or -wholename "*frontlinebuild*" -or -wholename "*frontlinecd*" -or -wholename "cd*" -or -wholename "*/bin/*" -or -wholename "*/svnroot/external/*" -or -wholename "*/.metadata/*" \) -print`
+
+echo generating backup list `pwd`
+echo generating backup list `pwd` >> $logfile
+find . -type f -not \( -name "*.exe" -or -name "*.dll" -or -name "*.class" -or -name "*.jar" -or -name "*.war" -or -name "*.zip" -or -name "*.tar" -or -name "*.tar.gz" -or -wholename "*\.svn*" -or -name "*\.log*" -or -wholename "*sourcebuild*" -or -wholename "*frontlinebuild*" -or -wholename "*frontline-3rd-party*" -or -wholename "*frontlinecd*" -or -wholename "*/cd/*" -or -wholename "*/bin/*" -or -wholename "*/svnroot/external/*" -or -wholename "*/.metadata/*" \) -print > $bk_lst
+echo creating tar file
+echo creating tar file >> $logfile
+tar -czvf $bk_name --files-from $bk_lst
+echo storing on h
+ls -l $bk_name >> $logfile
+echo storing on h >> $logfile
+mv $bk_name $bk_location
+
+
+# 2. d:\dev
+bk_name=/d/maigue_code_dev.tar.gz
+bk_lst=/d/backup_dev.lst
+echo backing up code
+echo backing up code >> $logfile
+
+cd /d/dev
+#tar cvf /d/maigue_code.tar `find . -type f -not \( -name "*.exe" -or -name "*.class" -or -name "*.jar" -or -name "*.zip" -or -wholename "*\.svn*" -or -name "*\.log*" -or -wholename "*sourcebuild*" -or -wholename "*frontlinebuild*" -or -wholename "*frontlinecd*" -or -wholename "cd*" -or -wholename "*/bin/*" -or -wholename "*/svnroot/external/*" -or -wholename "*/.metadata/*" \) -print`
+
+echo generating backup list `pwd`
+echo generating backup list `pwd` >> $logfile
+find . -type f -not \( -name "*.exe" -or -name "*.dll" -or -name "*.class" -or -name "*.jar" -or -name "*.war" -or -name "*.zip" -or -name "*.tar" -or -name "*.tar.gz" -or -wholename "*\.svn*" -or -name "*\.log*" -or -wholename "*sourcebuild*" -or -wholename "*frontlinebuild*" -or -wholename "*frontline-3rd-party*" -or -wholename "*frontlinecd*" -or -wholename "*/cd/*" -or -wholename "*/bin/*" -or -wholename "*/svnroot/external/*" -or -wholename "*/.metadata/*" \) -print > $bk_lst
+echo creating tar file
+echo creating tar file >> $logfile
+tar -czvf $bk_name --files-from $bk_lst
+echo storing on h
+ls -l $bk_name >> $logfile
+echo storing on h >> $logfile
+mv $bk_name $bk_location
+
+
+echo done `date` >> $logfile

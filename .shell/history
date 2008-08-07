@@ -1,0 +1,153 @@
+ll
+alias
+cat .bash_profile 
+cd .shell/
+vi bashrc 
+ll 
+ls -l
+vi aliases 
+. aliases 
+ll
+alias
+ll
+eval `dircolors -b dircolors`
+ll
+dircolors --print
+type vi
+pwd
+env | grep PATH
+pwd
+ll
+vi bashrc 
+exit
+type cvs
+type vi
+type uname
+env
+set
+pwd
+cd .shell
+exit
+pwd
+cd .shell/
+vi bashrc
+exit
+alias
+cvsnt
+pwd
+export CVSROOT=:ntserver:pc-bfs-gmchmxp:/JavaSwing1 init
+export CVSROOT=:ntserver:pc-bfs-gmchmxp:/JavaSwing1
+cvsnt -d i:/cvsrepo/JavaSwing1 init
+cvs passwd -a gary
+cvsnt passwd -a gary
+env | grep CVS
+cvs login
+cvsnt login
+cvsnt -d i:/cvsrepo/JavaSwing1 init
+cvsnt passwd -a gary
+cvsnt passwd -a gary
+cvsnt passwd -a gary
+ftp gazzaa.darktech.org
+ipconfig
+ifconfig
+ipconfig
+ftp gazzaa.darktech.org
+exit
+ftp gazzaa.darktech.org
+exit
+pwd
+ll
+umask
+chmod a+r tmp
+ll
+pwd
+ll -a
+cd /cygdrive/m/
+ll -a
+ftp gazzaa.darktech.org
+ll
+cd f:
+ll
+cd Data
+ll
+cd ,,
+cd ..
+find . -name Winset.dll -print
+cd
+cd .shell
+ll -a
+exit
+ll
+ll -rt
+cd
+prjfl
+alias
+pwd
+cd
+cd .shell
+ll -a
+ll
+ll -a
+vi README
+exit
+pwd
+cd d:
+cd i:
+cd project.java/
+ll
+cd JavaSwingExamples/
+cd JTree1/
+ll
+cd src
+kk
+ll
+dircolors
+eval `dircolors -b ~/.shell/.dircolors`
+ll
+vi ~/.shell/.dircolors 
+eval `dircolors -b ~/.shell/.dircolors`
+ll
+ll CVS
+env | grep CVSROOT
+popd
+c
+cd
+pwd
+cd .shell
+ll
+touch cvsinfo
+vi cvsinfo 
+env | grep CVS
+. cvsinfo 
+env | grep CVS
+vi cvsinfo  &
+env | grep CVS
+vi cvsinfo  &
+. cvsinfo 
+env | grep CVS
+cat cvsinfo 
+cd ..
+cvs co .shell
+cd .shell
+ll
+vi cvsinfo  &
+pwd
+pwd
+cvs add cvsinfo 
+cvs commit
+cvs info
+cvs status cvsinfo 
+exit
+env | grep CVSROOT
+cvs login
+cd i:
+cd project.java/
+ll
+cd JTree1/
+ll
+cd ..
+cd JavaSwing1
+ll
+cvs add
+cvs add -m "Initial Import" *
+exit

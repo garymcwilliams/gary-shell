@@ -1,0 +1,218 @@
+#!/bin/bash
+#
+# script to clean out 'old' sources from build folder
+#
+
+outputusage()
+{
+	echo "Usage: clearbuild"
+	echo "   clearbuild will remove old sources from build environment"
+#	echo "   if neither 4 nor 5 are specified, then the script"
+#	echo "      will attempt to guess the correct root based on pwd"
+	exit 2
+}
+
+# setup files that are to be removed from all versions of FrontLine
+commonfiles="
+core/bean/browserbean/IceBrowserBean
+core/bean/clientdetailsview/ClientDetailsView
+core/bean/clientdetailsview/ClientDetailsTabPanel
+core/bean/createinteractionview/CreateInteractionDialog
+core/bean/emailview/SendEmailDialog
+core/bean/enquiryinteractionmodel/EnquiryInteractionModel
+core/bean/enquiryinteractionview/EnquiryClassificationDialog
+core/service/expressservice/ExpressService
+"
+
+# setup files that are to be removed from v4 of Frontline
+v4files="
+"
+
+# setup files that are to be removed from v5 of Frontline
+v5files="
+core/bean/emailview/EmailView
+core/bean/emailview/ReallocateDialog
+core/bean/interactionhistoryview/EmailDetailsViewer
+core/bean/interactionhistoryview/InteractionDetailsViewer
+core/service/casemanservice/DatabaseWorker
+core/service/casemanservice/DatabaseWorkerFactory
+core/service/casemanservice/DatabaseWorkerInterface
+core/service/casemanservice/DB2DatabaseWorker
+core/service/casemanservice/OS390DB2DatabaseWorker
+core/service/emailservice/DatabaseWorkerFactory
+core/service/emailservice/DatabaseWorkerInterface
+core/service/emailservice/DB2DatabaseWorker
+core/service/emailservice/OS390DB2DatabaseWorker
+core/service/interactionprofileservice/DatabaseWorkerFactory
+core/service/interactionprofileservice/DatabaseWorkerInterface
+core/service/interactionprofileservice/DB2DatabaseWorker
+core/service/interactionprofileservice/OS390DB2DatabaseWorker
+core/service/interactionprofileservice/OracleDatabaseWorker
+util/service/odmgatewayadaptor/ODMAdaptor
+util/service/odmgatewayadaptor/ODMAdaptorReply
+util/service/odmgatewayservice/ODMGatewayObjectTypes
+util/service/odmgatewayservice/ODMGatewaySearchTypes
+util/service/odmgatewayservice/ODMService
+util/service/odmgatewayservice/databaseservice/ODMDatabaseInterface
+util/service/odmgatewayservice/databaseservice/ODMDatabaseService
+util/service/odmgatewayservice/databaseservice/ODMException
+util/service/odmgatewayservice/transportable/NullTransportable
+util/service/odmgatewayservice/transportable/Transportable
+util/service/odmgatewayservice/transportable/XMLTransportable
+util/service/odmgatewayservice/transporter/JMSTransporter
+util/service/odmgatewayservice/transporter/NullTransporter
+util/service/odmgatewayservice/transporter/RMITransporter
+util/service/odmgatewayservice/transporter/Transporter
+util/service/odmgatewayservice/transportfactory/JMSTransportFactory
+util/service/odmgatewayservice/transportfactory/NullTransportFactory
+util/service/odmgatewayservice/transportfactory/RMITransportFactory
+util/service/odmgatewayservice/transportfactory/TransportFactory
+util/serviceinterface/odmgatewayserviceinterface/ODMGatewayServiceException
+util/serviceinterface/odmgatewayserviceinterface/ODMGatewayServiceInterface
+"
+
+# setup files that are to be removed from v5 of Frontline
+v512files="
+core/bean/archiveview/ArchiveView
+core/bean/caseconfigureview/CaseSubTypeDialog
+core/bean/caseconfigureview/CaseTitleDialog
+core/bean/caseconfigureview/CaseTypeDialog
+core/serviceinterface/useradmininterface/User
+"
+
+v512007files="
+core/util/importexport/ClassificationsImport
+"
+
+v513files="
+core/bean/enquiryinteractiondialogs/CaseDetailsUpdateDialog
+"
+
+v531files="
+core/bean/workqueueconfigureview/CMEmailWorkQueueDialog
+core/bean/workqueueconfigureview/EmailWorkQueuePanel
+"
+
+usev=${FLVER:-"none"}
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+. envbuild
+
+echo working from $PROJECT_BASE
+cd $PROJECT_BASE/lagancentre/code/com/lagan/lagancentre
+cdok=$?
+if [ $cdok -eq 1 ]; then
+	echo folder not found
+	exit
+fi
+
+for filename in $commonfiles
+do
+    fn=$filename.java
+	if [ -f $fn ]; then
+		rm -f $fn
+		echo "-" $fn removed
+	else
+		echo "*" $fn does not exist
+	fi
+done
+
+if [ $vermajor = "5" ]; then
+	for filename in $v5files
+	do
+	  fn=$filename.java
+	  if [ -f $fn ]; then
+		  rm -f $fn
+		  echo "-" $fn removed
+	  else
+		  echo "*" $fn does not exist
+	  fi
+	done
+	mv core/bean/CaseConfigureView core/bean/CaseConfigureView1
+	mv core/bean/CaseConfigureView1 core/bean/caseconfigureview
+
+	if [ "$verrelse" = "1" -a $verminor -gt 1 ]; then
+		for filename in $v512files
+		do
+		  fn=$filename.java
+		  if [ -f $fn ]; then
+			  rm -f $fn
+			  echo "-" $fn removed
+		  else
+			  echo "*" $fn does not exist
+		  fi
+		done
+	fi
+
+	if [ "$verrelse" = "1" -a $verminor -gt 2 ]; then
+		for filename in $v513files
+		do
+		  fn=$filename.java
+		  if [ -f $fn ]; then
+			  rm -f $fn
+			  echo "-" $fn removed
+		  else
+			  echo "*" $fn does not exist
+		  fi
+		done
+	fi
+
+	if [ "$verrelse" = "3" -a $verminor -gt 0 ]; then
+		for filename in $v531files
+		do
+		  fn=$filename.java
+		  if [ -f $fn ]; then
+			  rm -f $fn
+			  echo "-" $fn removed
+		  else
+			  echo "*" $fn does not exist
+		  fi
+		done
+	fi
+
+	# allow for the fact that the build may contain an alpha char (e.g. 5.1.2.007B)
+	verbuildnum=`expr "$verbuild" : '\(...\)'`
+	if [ "$verrelse" = "1" -a "$verminor" = "2" -a "$verbuildnum" -gt 6 ]; then
+		for filename in $v512007files
+		do
+		  fn=$filename.java
+		  if [ -f $fn ]; then
+			  rm -f $fn
+			  echo "-" $fn removed
+		  else
+			  echo "*" $fn does not exist
+		  fi
+		done
+	fi
+
+	if [ $verrelse -gt 1 ]; then
+		# remove the customer thinclient folders
+		dn=core/thinclient/customer
+		if [ -d $dn ]; then
+			rm -Rf $dn
+			echo "-" $dn removed
+		else
+			echo "*" $dn does not exist
+		fi
+	fi
+
+fi
+
+if [ $vermajor = 4 ]; then
+	for filename in $v4files
+	do
+	  fn=$filename.java
+	  if [ -f $fn ]; then
+		  rm -f $fn
+		  echo "-" $fn removed
+	  else
+		  echo "*" $fn does not exist
+	  fi
+	done
+fi
+
+
+# $Id: clearbuild,v 1.13 2005/01/06 10:18:07 gary Exp $

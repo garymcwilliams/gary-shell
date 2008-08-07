@@ -1,0 +1,8 @@
+echo mapping z to bfsnas-3
+net use z: \\\\bfsnas-3\\tmp
+echo mapping p to dfsroot
+net use p: \\\\dfsroot\\applications
+echo mapping l to colebrooke
+net use l: \\\\colebrooke\\lagan
+echo mapping h to roe
+net use h: \\\\roe\\home\\gary_mcwilliams

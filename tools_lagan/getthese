@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# script to resursively get the latest versions of existing files
+# so we only get the latest files for files that exist, as opposed to getall
+# which gets all files (phew)
+#
+
+cmd=cmget
+if [ ".$1" = ".-w" ]; then
+	cmd=cmedit
+fi
+
+for j in `ls -F`
+do
+  endch=`expr "$j" : '.*\(.\)$'`
+  suffix=`expr "$j" : '.*\.\(.*\)$'`
+  #rest=`expr "$j" : '\(.*\).$'`
+  #echo j=$j
+  #echo endch=$endch
+  #echo rest=$rest
+  # ignore un-needed files
+  if [ "$endch" = "/" ]
+  then
+	# ignore project work folders folders
+	  if [ $j = "CVS/" ]; then
+		  :
+	  elif [ $j = "bin/" ]; then
+		  :
+	  elif [ $j = "temp/" ]; then
+		  :
+	  else
+		  cd $j
+		  getthese $1
+		  cd ..
+	  fi
+  else
+	# ignore working files
+	  lastch=`expr "$j" : '.*\(.\)$'`
+	  if [ "$suffix" = "log" ]; then
+		  :
+	  elif [ $lastch = "~" ]; then
+		  :
+	  elif [ $lastch = "#" ]; then
+		  :
+	  else
+#		if [ $j -nt $dest/$j ]; then
+		  echo "  >" getting $j
+		  $cmd $j
+#		else
+#			echo "  " ignoring $j
+#		fi
+	  fi
+  fi
+done

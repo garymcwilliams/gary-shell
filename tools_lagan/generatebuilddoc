@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# script to parse the build files and generate the docs for inclusion
+# in docs (e.g. build notification)
+#
+
+# list the PCC numbers first
+build=5-1-3-000-20040915
+listpdf="cat /l/Projects/lagancentre/build/frontline/${build}/ccfile.txt | grep PDF | cut -d' ' -f2"
+
+pccfile=~/tmp/pcc$build
+pdffile=~/tmp/pdf$build
+
+# do the work for the type of file.
+# call this with either pcc or pdf for best results!
+generatedoc()
+{
+	type=$1
+	file=~/tmp/$type$build
+	rm -f $file
+	
+	echo saving $file
+	for cct in `cat /l/Projects/lagancentre/build/frontline/${build}/ccfile.txt | grep -i $type | cut -d' ' -f2`
+	do
+		echo $cct
+		echo -n "[$cct] " >> $file
+		showcc $cct >> $file
+		echo "" >> $file
+	done
+	
+	echo $file created
+}
+
+generatedoc pcc
+generatedoc pdf
+

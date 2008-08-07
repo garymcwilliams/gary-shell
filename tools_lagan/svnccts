@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# wrapper script for getcore.ksh
+#
+
+# Assumes that the Build env vars are correctly set!!!
+
+outputusage()
+{
+	echo "Usage: $0 builddir [-u] [-c[-s]] [-j] [-l] [-i]"
+	echo "   builddir is the directory where the build text files reside"
+	echo "     The builddir is matched, so it is possible to enter 5-1-2-001 to get"
+	echo "      the latest version of that build"
+	echo "   The script will also set the correct RCS environment for the build"
+	echo "     The frontline version is taken from first char of builddir"
+	echo "   -u : update only (retrieves only updated sources)"
+	echo "   -c : do not clean out the build destination folder"
+	echo "     -s : do not clean out the build source folder"
+	echo "   -j : pass on -j to getcore so that only Java sources are obtained"
+	echo "   -l : do *not* log the output"
+	echo "   -i : get and increment a build number"
+	exit 2
+}
+
+svn log $* | grep "^\(PDF\|PCC\|UDF\|UCC\)" | cut -b 1-9 | sort -u
+

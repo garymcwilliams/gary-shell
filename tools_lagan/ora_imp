@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# $Id:$
+#
+# Script to wrap up the 'import' of an oracle dump file
+#
+# final command line should look something like:
+# imp system/system@compiere file=fred.dmp fromuser="PRODWEB" touser="NEWBE"
+# 
+
+touser=$1
+touserpass=$2
+oracle=$3
+fromuser=$4
+dumpfile=$5
+
+cmd="imp $touser/$touserpass@$oracle file=$5 fromuser=\"$4\" touser=\"$1\""
+
+echo $cmd
+$cmd
+
+

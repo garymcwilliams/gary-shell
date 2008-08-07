@@ -1,0 +1,106 @@
+#!/bin/bash
+#; profile
+
+echo in ~/.shell/profile
+date
+
+#; set NODENAME for later use
+NODENAME="`uname -n`"
+export NODENAME
+
+#; If we're on a machine running X11, let's add it to our $PATH.
+X11R6="/usr/X11R6"
+if [ -d "${X11R6}/bin" ]; then
+ PATH="${PATH}:${X11R6}/bin"
+ export PATH
+fi
+
+if [ -r ~/.shell/manpath ]; then
+   . ~/.shell/manpath
+fi
+
+#; Check for a $TERM and/or modify it if need be.
+case ${TERM} in
+ xterm|xterm-color|cons25 )
+ TERM="rxvt"
+ export TERM
+ ;;
+
+ screen )
+ TERM="screen"
+ export TERM
+ ;;
+
+ vt220 )
+ TERM="vt220"
+ export TERM
+ ;;
+
+ unknown )
+ TERM="vt100"
+ export TERM
+ echo ' ! $TERM unkown. Setting to vt100.'
+ ;;
+esac
+
+#; Are we using GNU ls? If so, set the colors.
+if (dircolors >/dev/null); then
+ if (ls --color=yes >/dev/null); then
+  if [ "$?" = "0" ]; then
+   if [ -f ~/.shell/dircolors ]; then
+    eval `dircolors ~/.shell/dircolors`
+   else
+    eval `dircolors`
+   fi
+  fi
+ fi
+ alias ls='ls -aF --color=auto'
+else
+ alias ls='ls -l'
+fi
+
+#; Is less installed? If so, set it as a $PAGER.
+if (type less &>/dev/null); then
+ PAGER="less"
+ export PAGER
+ LESS_VERSION=$(less -V 2>&1|head -1|awk '{print $NF}'|awk -F'+' '{print $1}')
+ if [ "${LESS_VERSION:-0}" -gt "340" ]; then
+  LESS='-giMR'
+  export LESS
+ else
+  LESS='-giM'
+  export LESS
+ fi
+ #; Want to see number lines in `less`?
+ alias nless="less -N"
+ #; Make it easier to read when going through large files.
+ alias wless="less -JW"
+fi
+
+# These all moved to .inputrc file instead of here
+# Delete
+#bind '"\e[3~": delete-char'
+# Insert
+#bind '"\e[2~": paste-from-clipboard' 
+# Home
+#bind '"\M-[1~": beginning-of-line'
+# End
+#bind '"\M-[4~": end-of-line'
+
+#; Standard aliases sourced from a seperate file.
+if [ -f ${HOME}/shell/.shell/aliases ]; then
+      . ${HOME}/shell/.shell/aliases
+fi
+
+#; Local aliases per host - done last for override.
+if [ -f ${HOME}/shell/.shell/local_$NODENAME/local_aliases ]; then
+	echo node
+      . ${HOME}/shell/.shell/local_$NODENAME/local_aliases
+else
+	echo nf ${HOME}/shell/.shell/local_$NODENAME/local_aliases
+fi
+
+#; Gary's prompt stuff
+if [ -f ~/shell/.shell/setupPrompt ]; then . ~/shell/.shell/setupPrompt; fi
+
+#; $Id: profile,v 1.7 2004/12/01 16:44:44 gary Exp $

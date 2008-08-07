@@ -1,0 +1,107 @@
+#!/bin/bash
+# setup Visual C++ .Net
+VCINSTALLDIR="/d/Program\ Files/Microsoft\ Visual\ Studio\ .NET"
+#VCINSTALLDIR="d:/Program Files/Microsoft Visual Studio .NET"
+
+# if the installation does not exist then don't set it up
+if [ ! -d "$VCINSTALLDIR" ]; then
+	return
+fi
+
+########################################################
+# paths for tools etc
+########################################################
+
+# path for VC.Net tools
+vctoolspaths="
+Common7/IDE
+Common7/Tools
+FrameworkSDK/bin
+"
+vctoolspaths1="Common7/Tools/Bin"
+vctoolspaths2="Vc7/Bin"
+# path for windows tools
+winpaths="
+Wbem
+"
+# path for system32 tools
+winsyspaths="
+Microsoft.NET/Framework/v1.0.3705
+"
+
+vcpath=""
+for j in $vctoolspaths $vctoolspaths1 $vctoolspaths2
+do
+	mywinpath=`cygpath --windows --short "${VCINSTALLDIR}/${j}"`
+	mypath=`cygpath --unix $mywinpath`
+	vcpath="${vcpath}:$mypath"
+done
+
+for j in $winpaths
+do
+	mypath=`cygpath --unix --windir `/${j}
+	vcpath="${vcpath}:$mypath"
+done
+vcpath="$vcpath;`cygpath --sysdir`"
+for j in $winsyspaths
+do
+	mypath=`cygpath --unix --sysdir `/${j}
+	vcpath="${vcpath}:$mypath"
+done
+vcpath="$vcpath:`cygpath --windir`"
+
+PATH="$PATH:$vcpath"
+
+########################################################
+# set up the include path
+# passed to ms compiler, so needs to be in windows
+# format
+########################################################
+
+vcincludepaths="
+Vc7/atlmfc/include
+Vc7/include
+Vc7/PlatformSDK/Include/prerelease
+Vc7/PlatformSDK/Include
+FrameworkSDK/include
+FrameworkSDK/include
+"
+
+incpath=""
+for j in $vcincludepaths
+do
+	mypath=`cygpath --windows "${VCINSTALLDIR}/${j}"`
+	incpath="${incpath};$mypath"
+done
+export INCLUDE=$incpath
+
+########################################################
+# set up the lib path
+# passed to ms compiler, so needs to be in windows
+# format
+########################################################
+
+vclibpaths="
+VC7/ATLMFC/LIB
+VC7/LIB
+VC7/PlatformSDK/lib/prerelease
+VC7/PlatformSDK/lib
+FrameworkSDK/Lib
+"
+
+libpath=""
+for j in $vclibpaths
+do
+	mypath=`cygpath --windows "${VCINSTALLDIR}/${j}"`
+	libpath="${libpath};$mypath"
+done
+export LIB=$libpath
+
+# we need to do all this munging to allow correct handling of spaces
+# in file names
+mc=`cygpath --windows --short "${VCINSTALLDIR}/$vctoolspaths1/mc.exe"`
+mc=`cygpath --unix $mc`
+alias mc=$mc
+rc=`cygpath --windows --short "${VCINSTALLDIR}/$vctoolspaths2/rc.exe"`
+rc=`cygpath --unix $rc`
+alias rc=$rc

@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+#; $Id: cleanpatch,v 1.5 2004/09/10 12:26:42 gary Exp $
+
+# Assumes that the Build env vars are correctly set!!!
+
+outputusage()
+{
+	echo "Usage: `basename $0`"
+	echo "   `basename $0` will clean out the patch folder"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+
+cd /d/projects/frontline/${usev}/sourcepatch/projects
+cdok=$?
+if [ $cdok -eq 1 ]; then
+	echo patch folder not found
+	exit
+fi
+
+echo "cleaning out patch dir: `pwd`"
+rm -Rf lagancentre/code/*
+rm -Rf laganutil/code/*
+
+echo "cleaning patch control files"
+rm -f lagancentre_sources
+
+rm -f laganutil_sources
+rm -f pccs

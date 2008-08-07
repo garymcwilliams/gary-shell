@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# script to diff property files between frontline versions
+#
+
+
+# collect list of properties in specified build
+collectVersions()
+{
+	bld="$1"
+	fle="$2"
+	tmp="proptmp"
+	if [ -f $fle ]
+	then
+		rm -f $fle
+	fi
+	
+	for propfle in $containsproperties
+	do
+	  bldfle=$buildbasedir/$bld/$propfle
+	  grep properties $bldfle >> $tmp
+	done
+	echo sort -u $tmp > $fle
+	sort -u $tmp > $fle
+}
+
+
+
+buildbasedir=/l/Projects/lagancentre/build/frontline
+bldold=5-1-0-009-20031023
+bldnew=5-1-0-020-20031209
+
+containsproperties="
+lagancentrejava.txt
+"
+#lagancentreutil.txt
+#core_jspreports.txt
+#core_webportal.txt
+
+
+# collect list of properties in old build
+oldfile=~/tmp/oldprops
+collectVersions $bldold $oldfile
+echo Old=`cat $oldfile`
+
+# collect list of properties in new build
+newfile=~/tmp/newprops
+collectVersions $bldnew $newfile
+echo New=`cat $newfile`
+
+
+# now we need to join / merge them and do the diff thingy
+sort -m $oldfile $newfile > ~/tmp/sortedprops
+echo SORTED=`cat ~/tmp/sortedprops`

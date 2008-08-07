@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# script to find which build a PDF/PCC is in
+#
+
+outputusage()
+{
+	echo "Usage: `basename $0` change_control_number"
+	echo "   `basename $0` will find which build a change control is in"
+	exit 2
+}
+
+
+valid=1
+OPTIND=1
+#while getopts "ar" Option
+#do
+#  case $Option in
+#    a     ) tidydisk=y;;
+#    r     ) recurse=y;;
+#    *     ) valid=0;;   # DEFAULT, any other options are invalid
+#  esac
+#done
+
+#shift $(($OPTIND - 1))
+
+cct=$1
+
+cd /l/Projects/lagancentre/build/frontline
+
+# find latest version matching as much of datearg as specified
+folderpattern="[[:digit:]]-[[:digit:]]-[[:digit:]]-.*"
+
+ls -1d | grep $folderpattern
+
+for dir in `ls -1d * | grep $folderpattern`
+do
+	cd $dir
+	grep $cct ccfile.txt > /dev/null 2>&1
+	if [ "$?" = "0" ]; then
+		echo $dir
+	fi
+	cd ..
+done

@@ -1,0 +1,30 @@
+#; See if we can set our $MANPATH with manpath
+if (type manpath &>/dev/null); then
+ manpath -q  >/dev/null 2>&1
+  MANPATHRETVAL="`echo $?`"
+  if [ "${MANPATHRETVAL}" = "1" ]; then
+   MANPATH="`manpath`"		   	  # on a BSD variant !OpenBSD
+  elif [ "${MANPATHRETVAL}" = "0" ]; then
+   MANPATH="`manpath -q`"		  # most likely linux
+  fi
+#; OpenBSD is a bit screwy here.
+elif [ "${UNAME}" = "OpenBSD" ]; then
+ if [ -d "/usr/share/man" ]; then
+   MANPATH="/usr/share/man"
+   export MANPATH
+ fi
+ if [ -d "/usr/local/share/man" ]; then
+   MANPATH="/usr/local/share/man:${MANPATH}"
+   export MANPATH
+ fi
+else
+   echo ' ! Manpath search program not found. Set $MANPATH manually.'
+   export MANPATH
+fi
+
+if [ -d "/usr/local/man" ]; then
+ MANPATH="/usr/local/man:${MANPATH}"
+ export MANPATH
+fi
+
+

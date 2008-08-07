@@ -1,0 +1,232 @@
+;; -*- Mode: Emacs-Lisp -*-
+;; -*- lisp -*-
+;; Default emacs colors
+
+;  (blank-space-face ((t (:background "#4c6c4c"))))
+;  (blank-tab-face ((t (:background "#4c6c4c"))))
+
+(defvar color-styles nil)
+
+(defun add-color-style( name style )
+  (setq color-styles (nconc color-styles (list (list name style))))
+  (easy-menu-change '("edit")
+		    "Color styles"
+		    (mapcar '(lambda (entry)
+			       (vector (car entry) (list 'change-color-style (cadr entry)) t))
+			    color-styles)
+		    "text-properties"))
+
+(defun change-color-style( style )
+  (let ((lst style)
+	def-lst)
+    (setq used-color-style style)
+    (setq def-lst (car lst))
+    (setq lst (cdr lst))
+    (if option-package-load-line-highlight
+	(highlight-current-line-set-bg-color (car lst)))
+    (setq lst (cdr lst))
+    (if option-package-load-blinking-cursor
+	(setq blinking-cursor-colors (car lst)))
+    (setq lst (cdr lst))
+    (if (emacs-type-is-regular)
+	(progn
+	  (set-foreground-color (car def-lst))
+	  (set-background-color (cadr def-lst))
+	  (set-cursor-color (caddr def-lst))
+	  (set-mouse-color (cadddr def-lst))
+	  (set-border-color (cadddr (cdr def-lst))))
+      (progn
+	(custom-set-faces 
+	 (list 'default (list (list 't (list :foreground (car def-lst)
+					     :background (cadr def-lst))))))))
+    (while lst
+      (custom-set-faces (car lst))
+      (setq lst (cdr lst)))))
+
+;; Setup the colors
+(defconst color-style-amos '(
+ ("White" "DarkSlateBlue" "Pink" "Pink" "DarkSlateBlue")
+ "#403080"
+ ["Pink" "White"]
+ (default ((t (:foreground "Wheat"))))
+ (region ((t (:foreground "White" :background "MediumSlateBlue"))) t)
+ (modeline ((t (:foreground "DarkSlateBlue" :background "White"))) t)
+ (list-mode-item-selected ((t (:background "gray68"))) t)
+ (font-lock-comment-face ((t (:foreground "Coral"))))
+ (font-lock-builtin-face ((t (:foreground "Violet"))))
+ (font-lock-reference-face ((t (:foreground "DodgerBlue"))))
+ (font-lock-string-face ((t (:foreground "LimeGreen"))))
+ (font-lock-keyword-face ((t (:foreground "aquamarine"))))
+ (show-paren-mismatch-face ((((class color)) (:foreground "white" :background "red"))))
+ (isearch ((t (:foreground "black" :background "paleturquoise"))) t)
+ (paren-match ((t (:background "darkseagreen4"))) t)
+;; (widget-field-face ((((class color) (background light)) (:foreground "Red" :background "Brown"))))
+;; (widget-field-face ((((class color) (background dark)) (:foreground "Red" :background "Brown"))))
+;; (widget-button-face ((t (:bold t :foreground "black" :background "gray60"))))
+ (widget-field-face ((((class color) (background light)) (:foreground "yellow2" :background "#426c42"))))
+ (widget-button-face ((t (:background "#7B7D9C" :foreground "#494B5D"))))
+ (font-lock-preprocessor-face ((t (:italic nil :foreground "CornFlowerBlue"))) t)
+ (font-lock-type-face ((t (:foreground "#9290ff"))))
+ (highlight ((t (:foreground "black" :background "darkseagreen2"))))
+ (show-paren-match-face ((((class color)) (:foreground "black" :background "yellow"))))
+ (font-lock-variable-name-face ((t (:foreground "Khaki"))))
+ (font-lock-doc-string-face ((t (:foreground "green2"))) t)
+ (font-lock-function-name-face ((t (:foreground "SteelBlue"))))
+ (font-lock-keys-face ((t (:foreground "LightSteelBlue"))))
+ (font-lock-number-face ((t (:foreground "Yellow"))))
+ (font-lock-hexnumber-face ((t (:foreground "Orange"))))
+ (font-lock-floatnumber-face ((t (:foreground "DarkGrey"))))
+ (font-lock-qt-face ((t (:foreground "SkyBlue"))))
+ ))
+
+;; Setup the colors
+(defconst color-style-borland '(
+ ("White" "DarkBlue" "Pink" "Pink" "DarkSlateBlue")
+ "#403080"
+ ["Pink" "White"]
+ (default ((t (:foreground "Wheat"))))
+ (region ((t (:foreground "White" :background "MediumSlateBlue"))) t)
+ (modeline ((t (:foreground "DarkSlateBlue" :background "White"))) t)
+ (list-mode-item-selected ((t (:background "gray68"))) t)
+ (font-lock-comment-face ((t (:foreground "Coral"))))
+ (font-lock-builtin-face ((t (:foreground "Violet"))))
+ (font-lock-reference-face ((t (:foreground "DodgerBlue"))))
+ (font-lock-string-face ((t (:foreground "LimeGreen"))))
+ (font-lock-keyword-face ((t (:foreground "aquamarine"))))
+ (show-paren-mismatch-face ((((class color)) (:foreground "white" :background "red"))))
+ (isearch ((t (:foreground "black" :background "paleturquoise"))) t)
+ (paren-match ((t (:background "darkseagreen4"))) t)
+ (widget-field-face ((((class color) (background light)) (:foreground "yellow2" :background "#426c42"))))
+ (widget-button-face ((t (:background "#7B7D9C" :foreground "#494B5D"))))
+ (font-lock-preprocessor-face ((t (:italic nil :foreground "CornFlowerBlue"))) t)
+ (font-lock-type-face ((t (:foreground "#9290ff"))))
+ (highlight ((t (:foreground "black" :background "darkseagreen2"))))
+ (show-paren-match-face ((((class color)) (:foreground "black" :background "yellow"))))
+ (font-lock-variable-name-face ((t (:foreground "Khaki"))))
+ (font-lock-doc-string-face ((t (:foreground "green2"))) t)
+ (font-lock-function-name-face ((t (:foreground "SteelBlue"))))
+ (font-lock-keys-face ((t (:foreground "LightSteelBlue"))))
+ (font-lock-number-face ((t (:foreground "Yellow"))))
+ (font-lock-hexnumber-face ((t (:foreground "Orange"))))
+ (font-lock-floatnumber-face ((t (:foreground "DarkGrey"))))
+ (font-lock-qt-face ((t (:foreground "SkyBlue"))))
+ ))
+
+;; Setup the colors
+(defconst color-style-trebuchet '(
+ ("White" "#456345" "Pink" "Pink" "DarkSlateBlue")
+ "#395939"
+ ["Pink" "White"]
+ (default ((t (:foreground "White"))))
+ (region ((t (:foreground "Wheat" :background "#233625"))) t)
+ (modeline ((t (:foreground "White" :background "#324627"))) t)
+ (list-mode-item-selected ((t (:background "gray68"))) t)
+ (font-lock-comment-face ((t (:foreground "#f9cf27" :background "#355335"))))
+ (font-lock-builtin-face ((t (:italic t :foreground "#a6fab0"))))
+ (font-lock-reference-face ((t (:foreground "DodgerBlue"))))
+ (font-lock-string-face ((t (:foreground "#e5b6a5"))))
+ (font-lock-keyword-face ((t (:foreground "#a5b6c7"))))
+ (show-paren-mismatch-face ((((class color)) (:foreground "white" :background "red"))))
+ (isearch ((t (:foreground "black" :background "paleturquoise"))) t)
+ (paren-match ((t (:background "darkseagreen4"))) t)
+ (widget-field-face ((((class color) (background light)) (:foreground "yellow2" :background "#426c42"))))
+ (widget-button-face ((t (:background "#7B7D9C" :foreground "#494B5D"))))
+ (font-lock-preprocessor-face ((t (:italic nil :foreground "CornFlowerBlue"))) t)
+ (font-lock-type-face ((t (:foreground "#82b5df"))))
+ (highlight ((t (:foreground "black" :background "darkseagreen2"))))
+ (show-paren-match-face ((((class color)) (:foreground "black" :background "yellow"))))
+ (font-lock-variable-name-face ((t (:foreground "Cyan"))))
+ (font-lock-doc-string-face ((t (:foreground "green2"))) t)
+ (font-lock-function-name-face ((t (:foreground "#d99560"))))
+ (font-lock-keys-face ((t (:foreground "#e2bd57" :background "#486749"))))
+ (font-lock-number-face ((t (:foreground "Yellow"))))
+ (font-lock-hexnumber-face ((t (:foreground "#c193a5"))))
+ (font-lock-floatnumber-face ((t (:foreground "#82a2f2"))))
+ (font-lock-qt-face ((t (:foreground "#25d476"))))
+ (message-header-to-face ((t (:bold t :foreground "yellow3"))))
+ (message-header-cc-face ((t (:foreground "yellow"))))
+ (message-header-subject-face ((t (:foreground "#FFE2C5"))))
+ (message-header-other-face ((t (:foreground "#FB8772"))))
+ (message-header-name-face ((t (:foreground "white"))))
+ (message-separator-face ((t (:background "#335333" :foreground "Gray"))))
+ (message-cited-text-face ((t (:foreground "#ffa000"))))
+ (gnus-header-name-face ((t (:foreground "#ffa000"))))
+ (gnus-header-content-face ((t (:italic t :foreground "#f4a0f0"))))
+ (gnus-signature-face ((t (:italic t :foreground "#EDA04E"))))
+ (gnus-article-mouse-face (((t (:background "#608F60" :foreground "black")))))
+ ))
+
+;;(setq default-color-style color-style-trebuchet)
+;;(setq default-color-style color-style-borland)
+;;(setq default-color-style color-style-amos)
+
+;; Add default color styles
+;;(add-color-style "Amos" 'color-style-amos)
+;;(add-color-style "Borland" 'color-style-borland)
+;;(add-color-style "Trebuchet" 'color-style-trebuchet)
+
+
+;; This is deprecated
+; (custom-set-faces
+;  '(default ((t (:foreground "Wheat"))))
+;  '(region ((t (:foreground "White" :background "MediumSlateBlue"))) t)
+;  '(modeline ((t (:foreground "DarkSlateBlue" :background "White"))) t)
+;  '(list-mode-item-selected ((t (:background "gray68"))) t)
+;  '(font-lock-comment-face ((t (:foreground "Coral"))))
+;  '(font-lock-builtin-face ((t (:foreground "Violet"))))
+;  '(font-lock-reference-face ((t (:foreground "DodgerBlue"))))
+;  '(font-lock-string-face ((t (:foreground "LimeGreen"))))
+;  '(font-lock-keyword-face ((t (:foreground "aquamarine"))))
+;  '(show-paren-mismatch-face ((((class color)) (:foreground "white" :background "red"))))
+;  '(isearch ((t (:foreground "black" :background "paleturquoise"))) t)
+;  '(paren-match ((t (:background "darkseagreen4"))) t)
+;  '(widget-field-face ((((class color) (background light)) (:foreground "Red" :background "Brown"))))
+;  '(widget-field-face ((((class color) (background dark)) (:foreground "Red" :background "Brown"))))
+;  '(widget-button-face ((t (:bold t :foreground "black" :background "gray60"))))
+;  '(font-lock-preprocessor-face ((t (:italic nil :foreground "CornFlowerBlue"))) t)
+;  '(font-lock-type-face ((t (:foreground "#9290ff"))))
+;  '(highlight ((t (:foreground "black" :background "darkseagreen2"))))
+;  '(show-paren-match-face ((((class color)) (:foreground "black" :background "yellow"))))
+;  '(font-lock-variable-name-face ((t (:foreground "Khaki"))))
+;  '(font-lock-doc-string-face ((t (:foreground "green2"))) t)
+;  '(font-lock-function-name-face ((t (:foreground "SteelBlue"))))
+;  '(font-lock-keys-face ((t (:foreground "LightSteelBlue"))))
+;  '(font-lock-number-face ((t (:foreground "Yellow"))))
+;  '(font-lock-hexnumber-face ((t (:foreground "Orange"))))
+;  '(font-lock-floatnumber-face ((t (:foreground "DarkGrey"))))
+;  '(font-lock-qt-face ((t (:foreground "SkyBlue"))))
+;  )
+; (set-foreground-color "White")
+; (set-background-color "DarkSlateBlue")
+; (set-cursor-color "Pink")
+; (set-mouse-color "Pink")
+; (set-border-color "DarkSlateBlue")
+
+(setq initial-frame-alist
+      (cons 
+       '(foreground-color  . "White")
+       initial-frame-alist))
+(setq initial-frame-alist
+      (cons 
+       '(background-color  . "#456345")
+       initial-frame-alist))
+(setq initial-frame-alist
+      (cons 
+       '(cursor-color      . "Pink")
+       initial-frame-alist))
+
+;; Display settings
+;; default size and color options for all frames
+;; foreground, background, and cursor colors 
+(setq default-frame-alist
+      (cons 
+       '(foreground-color  . "White")
+       default-frame-alist))
+(setq default-frame-alist
+      (cons 
+       '(background-color  . "#456345")
+       default-frame-alist))
+(setq default-frame-alist
+      (cons 
+       '(cursor-color      . "Pink")
+       default-frame-alist))

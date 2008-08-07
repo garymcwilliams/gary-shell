@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+#
+# script to reset the e'x'ecutable attribute on all source files
+for codetype in java cpp c h xml xsl obj htm idb pdb txt sql
+do
+  for fle in *.$codetype
+  do
+    if [ -x $fle ]; then
+      chmod -x $fle
+    fi
+  done
+done
+
+# $Id: resetcode,v 1.1 2003/05/30 17:40:02 gary Exp $

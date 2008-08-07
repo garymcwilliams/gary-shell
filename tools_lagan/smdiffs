@@ -1,0 +1,123 @@
+#!/bin/bash
+#
+# script will find files, run cmdiff, then allow a commit
+
+outputusage()
+{
+	echo "Usage: `basename $0` -p PCC_number -v frontlineversion -m commit message [-w] [-g]"
+	echo "   `basename $0` will diff & ask for commit of files with the defined PCC number and message"
+	echo "   -g will perform a cmget on the file after the smput"
+	echo "   -w will make files writable if not already (used for CVS controlled dirs)"
+	echo "   if no -p is given then the PCC defined in the PCC env var is used"
+	echo "   -v allows the specification of the version string to be used"
+	echo "      if no -v is given then the version defined in the PCCVER env var is used"
+	exit 2
+}
+
+if [ $# -lt 2 ]
+then
+	outputusage
+fi
+
+typeset -i pid=$$
+case $pid in
+  -*) let pid=-$pid;;
+esac
+
+msg=""
+pcc=${PCC:-""}
+get=
+valid=1
+ver=${PCCVER:-""}
+makewritable=
+
+while getopts ":m:p:gwv:" Option
+do
+  case $Option in
+    m     ) msg=$OPTARG;;
+    p     ) case $OPTARG in
+		      PCC_[0-9][0-9][0-9][0-9][0-9])	pcc=$OPTARG;;
+		      PDF_[0-9][0-9][0-9][0-9][0-9])	pcc=$OPTARG;;
+     	      *)	                            valid=0;;
+          esac;;
+    g     ) get=-g;;
+    w     ) makewritable=-w;;
+    v     ) case $OPTARG in
+		      [0-9]\.[0-9]\.[0-9])	ver=$OPTARG;;
+     	      *)	                valid=0;;
+          esac;;
+    *     ) valid=0;;   # DEFAULT
+  esac
+done
+
+#echo msg=$msg
+echo pcc=$pcc
+echo ver=$ver
+#echo valid=$valid
+#exit
+
+if [ "x$pcc" = "x" ]; then
+	echo "you must specify a valid PCC number"
+	valid=0
+fi
+
+if [ "x$ver" = "x" ]; then
+	echo "you must specify a valid frontline version"
+	valid=0
+fi
+
+if [ $valid = 0 ]; then
+	echo "invalid option specified, please check"
+	outputusage
+fi
+
+shift $(($OPTIND - 1))
+
+
+if [ "x$msg" = "x" ]; then
+	rm -f ~/tmp/${pid}com.ent
+
+	while true
+    do
+	  echo "Comments (finish with line having just a dot):"
+	  got_a_line=0
+	  while true
+	  do
+		read -e comment_line
+        
+        if [ "$comment_line" = "." ]
+		then
+            break
+        fi
+        got_a_line=1
+        echo $comment_line >> ~/tmp/${pid}com.ent
+	  done
+	  if [ $got_a_line = 1 ]
+		  then
+		  break
+	  fi
+	  echo "?Must enter at least one line." >&2
+	done
+else
+    echo $msg >> ~/tmp/${pid}com.ent
+fi
+
+msg=`cat ~/tmp/${pid}com.ent`
+echo msg=$msg
+
+
+
+for file in `find . -type f -maxdepth 1 \! -name "\.*" -print`
+do
+	file1=`basename $file`
+	echo file=$file1
+	cmdiff $file1
+	
+	echo -n "commit? "
+	read commit
+	
+	if [ "$commit" = "y" ]; then
+		smput_latest -p $pcc -v $ver -m "$msg" $get $makewritable $file1
+	fi
+done
+

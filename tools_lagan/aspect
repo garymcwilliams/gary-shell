@@ -1,0 +1,110 @@
+#!/bin/bash
+#
+# script to manage the aspect 'package' issues for dev
+# builds
+#
+# NOTE that we use 'mv' to move the files. This way there's only ever one of them
+# and this should help with any confusion due to duplicate files or whatever
+#
+outputusage()
+{
+	echo "Usage: `basename $0` -i|o"
+	echo "   `basename $0` will move the hacked Aspect sources"
+	echo "   -i : put aspect code INTO the correct packages"
+	echo "   -o : get aspect code OUT of the correct packages"
+	exit 2
+}
+
+copyfile()
+{
+	file=$1
+	package=$2
+	in=$3
+
+	if [ $in = 1 ]
+	then
+		if [ -e $file ]
+		then
+			# does the package folder exist?
+			if [ ! -d ../$package ]; then
+				echo creating folder `cygpath --unix ../$package`
+				mkdir -p ../$package
+			fi
+			mv -f $file ../$package
+		else
+			echo no file: $file
+		fi
+	else
+		if [ -e ../$package/$file ]
+		then
+			mv -f ../$package/$file .
+		fi
+	fi
+}
+
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+if [ $verbuild != "bds" ]
+then
+	echo not in a bds environment: $FLVAR
+	exit
+fi
+
+in=-1
+valid=1
+
+OPTIND=1
+while getopts "io" Option
+do
+  case $Option in
+    i     ) in=1;;
+    o     ) in=0;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+# must be one of in or out
+if [ $in = -1 ]
+then
+	echo "must specify either -o or -i"
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+#echo "setting Version $usev environment"
+
+# assuming we are in the correct bds environment
+echo MY_ROOT=$MY_ROOT_DIR
+
+cd $MY_ROOT_DIR/../sourcedev/projects/lagancentre/code/com/lagan/lagancentre/aspect
+
+file=TelephonyModel.java
+package=core/bean/telephonymodel
+copyfile $file $package $in
+
+file=WorkControlView.java
+package=core/bean/workcontrolview
+copyfile $file $package $in
+
+file=DefaultNumberSelector.java
+package=core/bean/phonenumberselectors
+copyfile $file $package $in

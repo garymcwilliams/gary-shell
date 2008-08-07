@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# script to clean out 'old' build remnant before a new build occurs.
+#
+
+outputusage()
+{
+	echo "Usage: buildant [-l]"
+	echo "   buildant will build the version of frontline"
+	echo "   -l : do *not* log the output"
+	exit 2
+}
+
+
+usev=${FLVER:-"none"}
+if [ $usev = "none" ]
+then
+	echo no FLVER set
+	outputusage
+	exit
+fi
+
+
+vermajor=`echo $usev | cut -d- -f1`
+verrelse=`echo $usev | cut -d- -f2`
+verminor=`echo $usev | cut -d- -f3`
+verbuild=`echo $usev | cut -d- -f4`
+
+log=y
+valid=1
+
+OPTIND=1
+while getopts "erlop:" Option
+do
+  case $Option in
+    l     ) log=n;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $# -gt 0 ]
+then
+	valid=0
+fi
+
+if [ $valid = 0 ]
+then
+	outputusage
+fi
+
+echo "using Version $usev environment"
+. envbuild -a
+
+cd $MY_ROOT_DIR/projects/lagancentre/build/frontline/buildscripts
+
+if [ ! -f ./build.xml ];
+then
+  echo "could not find ./build.xml, you are not in correct directory"
+fi
+
+
+echo "build dir: $MY_BUILD_DIR"
+
+export BASH_ENV=/h/shell/tools_lagan/buildshell
+echo MY_BUILD=$MY_BUILD_DIR
+cmd="ant"
+if [ $log = "y" ];
+then
+	logfile=$MY_ROOT_DIR/buildant.log
+	echo logging to $logfile
+	$cmd > $logfile 2>&1
+else
+	$cmd
+fi
+
+# $Id: buildant,v 1.4 2004/12/15 17:47:14 gary Exp $

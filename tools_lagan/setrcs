@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# script to set the correct RCS PROJECT environment
+# based on input parameter
+
+outputusage()
+{
+	echo "Usage: setrcs [-c|-l] [-b | -p]"
+	echo "   -l setup for the L: drive"
+	echo "   -c(urrent)"
+	echo "   -b is used to set RCS for the BUILD environment, rather than dev"
+	echo "   -p is used to set RCS for the PATCH environment, rather than dev"
+	exit 2
+}
+
+usev=${FLVER:-"none"}
+
+# latest dir naming
+rcsdir="sourcedev"
+usecurrent=n
+usel=n
+valid=1
+
+OPTIND=1
+while getopts ":bpcl" Option
+do
+  case $Option in
+    b     ) rcsdir="sourcebuild";;
+    p     ) rcsdir="sourcepatch";;
+    c     ) usecurrent=y;;
+    l     ) usel=y;;
+    *     ) valid=0;;   # DEFAULT, any other options are invalid
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ $valid = 0 ]
+then
+	outputusage
+	exit
+fi
+
+if [ $usecurrent = "y" ]
+then
+	export PROJECT_BASE=`pwd`
+	cwd=`pwd`
+	export PROJECT_NAME=`basename $cwd`
+elif [ $usel = "l" ]
+then
+	export PROJECT_BASE=/l/Projects
+	export PROJECT_NAME=L:
+else
+	if [ "$usev" != "none" ]; then
+		vermajor=`echo $usev | cut -d- -f1`
+		verrelse=`echo $usev | cut -d- -f2`
+		verminor=`echo $usev | cut -d- -f3`
+		verbuild=`echo $usev | cut -d- -f4`
+		
+		if [ -d /d/projects/frontline/${usev}/${rcsdir}/projects ]; then
+			export PROJECT_BASE=/d/projects/frontline/${usev}/${rcsdir}/projects
+			export PROJECT_NAME=${usev}-$rcsdir
+		else
+			export PROJECT_BASE=unknown
+			export PROJECT_NAME=unknown
+		fi
+	else
+        # include the functions for auto-detect
+		. getprojgary
+
+        # attempt to auto-detect project
+		set_projectbase
+	fi
+fi
+echo PROJECT_BASE=$PROJECT_BASE
+
+# $Id: setrcs,v 1.6 2004/09/10 12:26:42 gary Exp $

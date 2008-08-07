@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+# script to wrap up cminfo
+#
+
+cminfo $1 | less
