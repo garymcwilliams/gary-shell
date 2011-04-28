@@ -15,27 +15,6 @@ if [ -d ~/shell/tools_$NODENAME ]; then
   PATH=~/shell/tools_$NODENAME:$PATH
 fi
 
-# determine if we use normal or locally cached utils
-#ldrive=`mount | grep "^l:" | cut -d: -f1`
-#if [ "$ldrive" = "l" ]; then
-#	BIN_BASE="/l/Projects"
-#else
-#	BIN_BASE="/d/tools"
-#fi
-
-local_ip=`ipconfig | grep "IP Address" | head -1 | cut -d: -f2 | cut -d" " -f2 | cut -d. -f1`
-#; configure groovy tools
-if [ "$local_ip" = "192" ]; then
-	BIN_BASE="/d/tools"
-	if [ -d $BIN_BASE/lagan/bin_groovy ]; then
-		PATH=$BIN_BASE/lagan/bin_groovy:$PATH
-	fi
-else
-	BIN_BASE="/l/Projects"
-	PATH=/l/Projects/lagan/bin_groovy:$PATH
-fi
-
-
 # The local tools may just configure path settings. If so, we should setup here
 if [ ".$java" != "." ]; then
 	JAVA_HOME=`cygpath --mixed $java`
@@ -55,11 +34,6 @@ if [ ".$maven" != "." ]; then
 	export PATH MAVEN_HOME MAVEN_HOME_LOCAL
 fi
 
-if [ ".$forrest" != "." ]; then
-	PATH="$PATH:$forrest/bin"
-	export PATH FORREST_HOME
-fi
-
 if [ ".$groovy" != "." ]; then
 	PATH="$PATH:$groovy/bin"
 	MY_GROOVY_DIR=$groovy/bin
@@ -72,57 +46,8 @@ if [ -f ~/shell/.shell/local_lagan/local_aliases ]; then
   . ~/shell/.shell/local_lagan/local_aliases
 fi
 
-BIN_CYGWIN="$BIN_BASE/lagan/bin_cygwin"
-BIN_RCS="$BIN_BASE/lagan/rcsbin"
-BIN_SHARED="$BIN_BASE/lagan/bin_shared"
-PATH="$BIN_CYGWIN:$BIN_RCS:$BIN_SHARED:$PATH"
-
-export LAGAN_SHELL_TYPE=CYGWIN_BASH
-
 #; SVN variables
 SVN_SSH='ssh -l gary'
 export SVN_SSH
 
-#setup Frontline build
-#export MY_BUILD_DIR=/d/frontlinebuild
-export MY_BUILD_DIR=d:/frontlinebuild
-export MY_CD_DIR=/d/frontlinecd
-#export MY_EXTRA_LIBS=/d/frontlinebuild/lib
-export MY_EXTRA_LIBS=d:/frontlinebuildlib
-export MY_JDK_DIR=$java
-export MY_ROOT_DIR=/d
-export MY_WIN_PATH=`cygpath --unix --sysdir`
-#export MY_WIN_PATH=/c/winnt/system32
-
-export MY_BUILD_PREFIX=5-1-1-0
-
-
-function cmcomplete()
-{
-    if [ "$PROJECT_BASE" != "" ]
-    then
-	    cwd=`pwd`;
-	    left=`expr "$cwd" : "${PROJECT_BASE}\(.*\)"`
-	
-	    if [ "$left" != "" ]
-	    then
-
-            if [ "$2" != "" ]
-            then
-                list=`"ls" L:/RCS/$left | grep -e ^$2`
-            else
-                list=`"ls" L:/RCS/$left`
-            fi
-            
-            COMPREPLY=($list)
-	    fi
-    fi
-}
-
-complete -F cmcomplete cmget
-complete -F cmcomplete cmedit
-complete -F cmcomplete cminfo
-
 set -o vi
-
-#; $Id: bashrc,v 1.1 2004/11/30 11:13:34 gary Exp $
