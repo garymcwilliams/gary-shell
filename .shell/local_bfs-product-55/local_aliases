@@ -1,0 +1,20 @@
+#!/bin/sh
+#; $HOME/.shell/local_aliases
+#; Local aliases customized on a "per host" basis.
+
+#echo in ~/.shell/local_bfs-product-24/local_aliases
+#date
+
+alias j142='export JAVA_HOME=d:/java/j2sdk1.4.2_13'
+
+alias vim='VIM=`cygpath -d $VIM` HOME=`cygpath -d $HOME` `cygpath -u $VIM`/vim73/gvim.exe'
+
+alias hudson_restart='ssh root@bfs-pdt-build-1 "service tomcat restart"'
+alias hudson_ssh='ssh tomcat@bfs-pdt-build-1'
+alias svn_ssh='ssh root@prod-build-1'
+
+export VISUAL=vim
+export EDITOR=$VISUAL
+export SVNEDITOR=$EDITOR
+
+#; $Id: local_aliases,v 1.20 2005/02/07 10:53:33 gary Exp $
