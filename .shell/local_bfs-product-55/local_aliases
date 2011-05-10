@@ -16,6 +16,7 @@ alias svn_ssh='ssh root@prod-build-1'
 alias t='~/shell/tools/todo.sh'
 alias tls='~/shell/tools/todo.sh ls'
 alias work='tls @work'
+alias tedit='vim d:/Users/gmcwilliams/Dropbox/Personal/documents/todo/todo.txt'
 
 export VISUAL=vim
 export EDITOR=$VISUAL
