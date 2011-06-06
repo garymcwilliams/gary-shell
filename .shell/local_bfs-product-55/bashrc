@@ -17,7 +17,7 @@ fi
 
 #; Gary Added ant
 if [ ".$ANT_HOME" = "." ]; then
-	ANT_HOME=`cygpath --windows $LOCAL_APPS/apache-ant-1.8.1`
+	ANT_HOME=`cygpath --windows $LOCAL_APPS/apache-ant-1.8.2`
 fi
 if [ -d $ANT_HOME ]; then
 	ant=`cygpath --unix "$ANT_HOME"`
