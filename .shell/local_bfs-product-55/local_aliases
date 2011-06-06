@@ -17,6 +17,8 @@ alias t='~/shell/tools/todo.sh'
 alias tls='~/shell/tools/todo.sh ls'
 alias work='tls @work'
 alias tedit='vim d:/Users/gmcwilliams/Dropbox/Personal/documents/todo/todo.txt'
+alias tstart='cd /d/Users/gmcwilliams/Applications/apache-tomcat-6.0.32/bin;./startup.sh'
+alias tstop='cd /d/Users/gmcwilliams/Applications/apache-tomcat-6.0.32/bin;./shutdown.sh'
 
 export VISUAL=vim
 export EDITOR=$VISUAL
