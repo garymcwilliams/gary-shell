@@ -9,53 +9,55 @@ LOCAL_APPS=/d/Users/gmcwilliams/Applications
 
 #; Gary Added Java
 if [ ".$JAVA_HOME" = "." ]; then
-	JAVA_HOME=`cygpath --windows /d/java/64/jdk1.6.0_24`
-fi
-if [ -d $JAVA_HOME ]; then
-	java=`cygpath --unix "$JAVA_HOME"`
+	JAVA_HOME=/d/Java/64/jdk1.6.0_24
 fi
 
 #; Gary Added ant
 if [ ".$ANT_HOME" = "." ]; then
-	ANT_HOME=`cygpath --windows $LOCAL_APPS/apache-ant-1.8.2`
-fi
-if [ -d $ANT_HOME ]; then
-	ant=`cygpath --unix "$ANT_HOME"`
+	ANT_HOME=$LOCAL_APPS/apache-ant-1.8.2
 fi
 
 #; Gary Added tomcat
 if [ ".$TOMCAT_HOME" = "." ]; then
-	TOMCAT_HOME=`cygpath --windows /d/Tomcat5.5`
-fi
-if [ -d $TOMCAT_HOME ]; then
-	tomcat=`cygpath --unix "$TOMCAT_HOME"`
+	TOMCAT_HOME=/d/Tomcat5.5
 fi
 
 #; Gary Added Maven2
 if [ ".$M2_HOME" = "." ]; then
-	MAVEN_HOME=`cygpath --windows $LOCAL_APPS/apache-maven-2.2.1`
+	MAVEN_HOME=$LOCAL_APPS/apache-maven-2.2.1
 	M2_HOME=$MAVEN_HOME
 	M2=$M2_HOME/bin
 fi
-maven=`cygpath --unix "$MAVEN_HOME"`
 #MAVEN_HOME_LOCAL=/d/home/gary/.maven/plugins
 export M2 M2_HOME
 
 #; Gary Added Groovy
-# let lagan bashrc configure it
 if [ ".$GROOVY_HOME" = "." ]; then
-	groovy=/d/tools/Groovy/Groovy-1.5.7
-else
-	groovy=`cygpath --unix "$GROOVY_HOME"`
+	GROOVY_HOME=$LOCAL_APPS/Groovy/Groovy-1.5.7
 fi
 
 #; Gary Added vim
 if [ ".$VIM" = "." ]; then
-	export VIM=`cygpath --mixed $LOCAL_APPS/Vim`
+	export VIM=$LOCAL_APPS/Vim
 fi
 if [ ".$VIMRUNTIME" = "." ]; then
-	export VIMRUNTIME=`cygpath --mixed $VIM/vim73`
+	export VIMRUNTIME=$VIM/vim73
 	echo $VIMRUNTIME
+fi
+
+if [ $cygwin == true ]; then
+	JAVA_HOME=`cygpath --windows /d/Java/64/jdk1.6.0_24`
+	java=`cygpath --unix "$JAVA_HOME"`
+	ANT_HOME=`cygpath --windows $ANT_HOME`
+	ant=`cygpath --unix "$ANT_HOME"`
+	TOMCAT_HOME=`cygpath --windows $TOMCAT_HOME`
+	tomcat=`cygpath --unix "$TOMCAT_HOME"`
+	MAVEN_HOME=`cygpath --windows $LOCAL_APPS/apache-maven-2.2.1`
+	maven=`cygpath --unix "$MAVEN_HOME"`
+	GROOVY_HOME=`cygpath --windows $GROOVY_HOME`
+	groovy=`cygpath --unix "$GROOVY_HOME"`
+	export VIM=`cygpath --mixed $VIM`
+	export VIMRUNTIME=`cygpath --mixed $VIMRUNTIME`
 fi
 
 # This is a LAGAN box, so add in LAGAN stuff

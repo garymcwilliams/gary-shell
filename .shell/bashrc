@@ -3,14 +3,23 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-#echo in bashrc
-#date
-
 # If not running interactively, don't do anything:
 [ -z "$PS1" ] && return
 
+#echo in bashrc
+#date
+
 SHELL=bash
 export SHELL
+
+cygwin=false
+mingw=false
+darwin=false
+case "`uname`" in
+CYGWIN*) cygwin=true;;
+MINGW*) mingw=true;;
+Darwin*) darwin=true;;
+esac
 
 # don't put duplicate lines in the history. See bash(1) for more options
 #export HISTCONTROL=ignoredups
@@ -18,11 +27,7 @@ export SHELL
 # make cygwin case insensitive
 #shopt -s nocaseglob
 
-# are we running under cygwin
-type cygpath > /dev/null 2>&1
-cygwin="$?"
-
-if [ $cygwin = 0 ]; then
+if [ $cygwin == true ]; then
     # convert the initial windows path (replacing space-filled names e.g. Program Files as necessary)
     #export PATHWIN=$PATH
     PATH=`cygpath --mixed --path --short-name "$PATH" | xargs cygpath --unix --path`
@@ -37,13 +42,14 @@ unset MAILCHECK
 
 #; Localised configuration
 if [ -f ${HOME}/shell/.shell/local_$NODENAME/bashrc ]; then
+#      echo ${HOME}/shell/.shell/local_$NODENAME/bashrc
       . ${HOME}/shell/.shell/local_$NODENAME/bashrc
 fi
 
 export PATH
 
 #; Add in local directories, just for fun and convenience
-PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
+#PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
 export PATH
 
 #; Setup a safe $TMP dir
@@ -74,8 +80,10 @@ if [ -d ~/shell/tools_$NODENAME ]; then
 fi
 
 # enable color support of ls and also add handy aliases
-if [ "$TERM" != "dumb" ]; then
+if [ $mingw == false ] && [ "$TERM" != "dumb" ]; then
     eval "`dircolors -b`"
 fi
+
+#echo out bashrc
 
 #; $Id: bashrc,v 1.13 2004/11/30 11:13:34 gary Exp $

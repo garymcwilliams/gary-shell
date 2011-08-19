@@ -7,7 +7,11 @@
 
 alias j142='export JAVA_HOME=d:/java/j2sdk1.4.2_13'
 
-alias vim='VIM=`cygpath -d $VIM` HOME=`cygpath -d $HOME` `cygpath -u $VIM`/vim73/gvim.exe'
+if [ $cygwin == true ]; then
+	alias vim='VIM=`cygpath -d $VIM` HOME=`cygpath -d $HOME` `cygpath -u $VIMRUNTIME`/gvim.exe'
+else
+	alias vim='$VIMRUNTIME/gvim.exe'
+fi
 
 alias hudson_restart='ssh root@bfs-pdt-build-1 "service tomcat restart"'
 alias hudson_ssh='ssh tomcat@bfs-pdt-build-1'

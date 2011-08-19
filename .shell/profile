@@ -9,6 +9,15 @@
 NODENAME="`uname -n`"
 export NODENAME
 
+cygwin=false
+mingw=false
+darwin=false
+case "`uname`" in
+CYGWIN*) cygwin=true;;
+MINGW*)  mingw=true;;
+Darwin*) darwin=true;;
+esac
+
 #; Configure the editor.
 if (type emacs &>/dev/null); then
  EDITOR="emacs"
@@ -107,7 +116,7 @@ esac
 export SHELL
 
 #; Are we using GNU ls? If so, set the colors.
-if (dircolors >/dev/null); then
+if (! $mingw && dircolors >/dev/null); then
   if (ls --color=yes >/dev/null); then
  	if [ "$?" = "0" ]; then
 		if [ -f ~/.shell/dircolors ]; then
@@ -163,4 +172,5 @@ fi
 #; Gary's prompt stuff
 if [ -f ~/shell/.shell/setupPrompt ]; then . ~/shell/.shell/setupPrompt; fi
 
+#echo out ~/.shell/profile
 #; $Id: profile,v 1.7 2004/12/01 16:44:44 gary Exp $
