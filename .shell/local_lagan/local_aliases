@@ -6,44 +6,5 @@
 #date
 
 #; override default for local machine setup
-SVNDEFAULTWORKDIR="/d/projects/svnroot"
-SVNWORKDIR="${SVNDEFAULTWORKDIR}"
-SVNNBDEFAULTWORKDIR="/d/projects_notbackedup/svnroot"
-SVNNBWORKDIR="${SVNNBDEFAULTWORKDIR}"
-
-cctdir='/l/Projects/lagancentre/change' 
-
-projects="/d/projects"
-alias prj='cd $projects'
-
-alias flb='. flsetdir -b'
-alias fld='. flsetdir '
-alias fll='unset FLVER; cd /l/Projects/lagancentre;. setrcs'
-alias fllb='unset FLVER; cd /l/Projects/lagancentre/build/frontline;. setrcs'
-alias flamends='unset FLVER; cd $cctdir/amends;. setrcs'
-# NEW frontline alias, to be used in preference to the above
-# only works when you are in one of the frontline directories already!
-alias flrcs='unset FLVER;. setrcs'
-# where is the dev system located?
-alias prjfl='cd $projects/frontline'
-
-alias lc='cd $PROJECT_BASE/lagancentre'
-alias lu='cd $PROJECT_BASE/laganutil'
-alias core='cd $PROJECT_BASE/lagancentre/code/com/lagan/lagancentre/core'
-
-alias changes='cd /l/Projects/lagancentre/build/frontline/0-ChangeControls' 
-
-alias product='sqlplus product/lagan@anthodon'
-alias prodpull='sqlplus prodpull/case@anthodon'
-
-alias cct='ged $cctdir/amends/amends.cct $cctdir/defects/defects.cct $cctdir/wishes/wishes.cct'
-
-alias createuser='sqlplus /nolog @ P:/Oracle/Scripts/Create_User.sql'
-
-alias svndir='cd $SVNWORKDIR'
-alias svnfl6='cd $SVNWORKDIR/watergap/v6-0-trunk;export PROJECT_BASE=`pwd`;j142'
-alias svnutil='cd $SVNWORKDIR/util'
-alias svnpb='export SVN=`svn info | grep URL | cut -d" " -f2`;export PROJECT_NAME=$SVN'
-alias svnflb='cd $SVNNBWORKDIR/frontline_build;j142'
 
 #; $Id: local_aliases,v 1.4 2004/12/17 14:03:12 gary Exp $
