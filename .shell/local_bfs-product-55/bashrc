@@ -5,11 +5,20 @@
 #echo in ~/shell/.shell/local_bfs-product-55/bashrc
 #date
 
+# Delete
+#bind '"\e[3~": delete-char'
+# Insert
+#bind '"\e[2~": paste-from-clipboard' 
+# Home
+#bind '"\M-[1~": beginning-of-line'
+# End
+#bind '"\M-[4~": end-of-line'
+
 LOCAL_APPS=/d/Users/gmcwilliams/Applications
 
 #; Gary Added Java
 if [ ".$JAVA_HOME" = "." ]; then
-	JAVA_HOME=/d/Java/64/jdk1.6.0_24
+	JAVA_HOME=/d/Java/64/jdk1.7.0
 fi
 
 #; Gary Added ant
@@ -46,7 +55,7 @@ if [ ".$VIMRUNTIME" = "." ]; then
 fi
 
 if [ $cygwin == true ]; then
-	JAVA_HOME=`cygpath --windows /d/Java/64/jdk1.6.0_24`
+	JAVA_HOME=`cygpath --windows ${JAVA_HOME}`
 	java=`cygpath --unix "$JAVA_HOME"`
 	ANT_HOME=`cygpath --windows $ANT_HOME`
 	ant=`cygpath --unix "$ANT_HOME"`
@@ -64,3 +73,16 @@ fi
 if [ -e ~/shell/.shell/local_lagan/bashrc ]; then
   . ~/shell/.shell/local_lagan/bashrc
 fi
+
+emacs ()
+{
+#    cd `dirname $1` >/dev/null
+#    $emacswin/runemacs.exe `basename $1` >/dev/null &
+	# expand the full path of each file
+	files=
+	for f in $*
+	do
+	  files="$files `cygpath --windows $f`"
+	done
+    $emacswin/runemacs.exe $files
+}
