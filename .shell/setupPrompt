@@ -35,7 +35,7 @@ NO_COLOUR="\[\033[0m\]" # Neutral
 
 case $TERM in
     xterm*|rxvt*|cygwin*)
-        TITLEBAR='\[\033]0;\W - $PROJECT_NAME\007\]'
+        TITLEBAR='\[\033]0;\W\007\]'
         ;;
     *)
         TITLEBAR=""
@@ -51,7 +51,7 @@ esac
 
 case $TERM in
     xterm*|rxvt*|cygwin*|linux)
-		PS1="${TITLEBAR}$RED[$CYAN\$(date +%H%M)$RED]$RED[${GREEN}\$PROJECT_NAME:$BROWN\w$RED]\n\r$WHITE\$$NO_COLOUR "
+		PS1="${TITLEBAR}$RED[$CYAN\$(date +%H%M)$RED]$RED[$BROWN\w$RED]\n\r$WHITE\$$NO_COLOUR "
 		PS2='> '
 		PS4='+ '
         ;;
