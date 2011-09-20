@@ -35,7 +35,8 @@ NO_COLOUR="\[\033[0m\]" # Neutral
 
 case $TERM in
     xterm*|rxvt*|cygwin*)
-        TITLEBAR='\[\033]0;\W\007\]'
+#TITLEBAR="\[\033]0;\w\007\]"
+        TITLEBAR="\[\033]0;\w\007\]"
         ;;
     *)
         TITLEBAR=""
@@ -51,7 +52,8 @@ esac
 
 case $TERM in
     xterm*|rxvt*|cygwin*|linux)
-		PS1="${TITLEBAR}$RED[$CYAN\$(date +%H%M)$RED]$RED[$BROWN\w$RED]\n\r$WHITE\$$NO_COLOUR "
+#PS1="${TITLEBAR}$RED[$CYAN\$(date +%H%M)$RED]$RED[$BROWN\w$RED]\n\r$WHITE\$$NO_COLOUR "
+		PS1="${TITLEBAR}$BROWN\w\n\r$WHITE\$$NO_COLOUR "
 		PS2='> '
 		PS4='+ '
         ;;
@@ -66,4 +68,8 @@ case $TERM in
 		PS4=''
         ;;
 esac
+# check for Git Bash
+#test -e /bin/git.exe && PS1="${TITLEBAR}$BROWN\w$(__git_ps1)\n\r$WHITE\$$NO_COLOUR "
+test -e /bin/git.exe && PS1='\[\033]0;\w\007\033[32m\]\[\033[33m\w$(__git_ps1)\033[0m\]
+$ '
 
