@@ -11,7 +11,7 @@ YELLOW="\[\033[1;33m\]" # Yellow
 BLUE="\[\033[0;34m\]" # Blue
 C10="\[\033[1;34m\]" # Light Blue
 PURPLE="\[\033[0;35m\]" # Purple
-C12="\[\033[1;35m\]" # Light Purple
+LIGHTPURPLE="\[\033[1;35m\]" # Light Purple
 CYAN="\[\033[0;36m\]" # Cyan
 C14="\[\033[1;36m\]" # Light Cyan
 C15="\[\033[0;37m\]" # Light Gray
@@ -32,6 +32,8 @@ NO_COLOUR="\[\033[0m\]" # Neutral
 # Bash prompt
 
 #PS1="\n\r$P$C13[\t]$C5 \u@\h $P$C7\w$P\n\r$ "
+#PS1=\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$
+#PS1=\033]0;${PWD}\n\033[32m${USER}@${HOSTNAME} \033[33m${PWD/${HOME}/~}\033[0m\n$
 
 case $TERM in
     xterm*|rxvt*|cygwin*)
@@ -53,7 +55,7 @@ esac
 case $TERM in
     xterm*|rxvt*|cygwin*|linux)
 #PS1="${TITLEBAR}$RED[$CYAN\$(date +%H%M)$RED]$RED[$BROWN\w$RED]\n\r$WHITE\$$NO_COLOUR "
-		PS1="${TITLEBAR}$C12\u@\h:\w\n\r$WHITE\$$NO_COLOUR "
+		PS1="${TITLEBAR}$LIGHTPURPLE\u@\h $YELLOW\w\n$WHITE\$$NO_COLOUR "
 		PS2='> '
 		PS4='+ '
         ;;
@@ -72,4 +74,3 @@ esac
 #test -e /bin/git.exe && PS1="${TITLEBAR}$BROWN\w$(__git_ps1)\n\r$WHITE\$$NO_COLOUR "
 test -e /bin/git.exe && PS1='\[\033]0;\w\007\033[32m\]\[\033[33m\w$(__git_ps1)\033[0m\]
 $ '
-
