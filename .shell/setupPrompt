@@ -53,7 +53,7 @@ esac
 case $TERM in
     xterm*|rxvt*|cygwin*|linux)
 #PS1="${TITLEBAR}$RED[$CYAN\$(date +%H%M)$RED]$RED[$BROWN\w$RED]\n\r$WHITE\$$NO_COLOUR "
-		PS1="${TITLEBAR}$BROWN\w\n\r$WHITE\$$NO_COLOUR "
+		PS1="${TITLEBAR}$C12\u@\h:\w\n\r$WHITE\$$NO_COLOUR "
 		PS2='> '
 		PS4='+ '
         ;;
