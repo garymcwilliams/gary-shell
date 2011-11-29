@@ -4,6 +4,9 @@
 
 #echo in .bashrc
 
+# If not running interactively, don't do anything
+[[ "$-" != *i* ]] && return
+
 if [ -r ~/shell/.shell/bashrc ]; then
  . ~/shell/.shell/bashrc
 fi
