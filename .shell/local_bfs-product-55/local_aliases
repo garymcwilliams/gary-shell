@@ -6,8 +6,8 @@
 #date
 
 alias j142='export JAVA_HOME=d:/java/j2sdk1.4.2_13'
-alias lc='cd /d/dev/gitrepos/lagancentre.git'
-alias lu='cd /d/dev/gitrepos/laganutil.git'
+alias lc='cd /d/dev/gitrepos/trunk/lagancentre.git'
+alias lu='cd /d/dev/gitrepos/trunk/laganutil.git'
 
 
 if [ $cygwin == true ]; then
