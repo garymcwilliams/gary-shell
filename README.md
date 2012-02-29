@@ -25,6 +25,6 @@ runs with bash, cygwin-bash and git-bash
     cp shell/.bash_profile .
 
 ## Notes
-on git-bash (in work) the default $HOME dir of h: is not writable.
-You need to set the $HOME variable in the user environment to something
+on git-bash (in work) the default `$HOME` dir of `h:` is not writable.
+You need to set the `$HOME` variable in the user environment to something
 (for example `d:\users\gmcwilliams\` and cloning the repo into that
