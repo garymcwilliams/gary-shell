@@ -19,10 +19,10 @@ git checkout .
 runs with bash, cygwin-bash and git-bash
 
 ## Installation:
-cd ~
-git clone https://github.com/garymcwilliams/gary-shell.git shell
-cp shell/.bashrc .
-cp shell/.bash_profile .
+    cd ~
+    git clone ssh://ssh.github.com/garymcwilliams/gary-shell.git shell
+    cp shell/.bashrc .
+    cp shell/.bash_profile .
 
 ## Notes
 on git-bash (in work) the default $HOME dir of h: is not writable.
