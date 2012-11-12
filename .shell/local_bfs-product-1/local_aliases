@@ -1,0 +1,34 @@
+#!/bin/sh
+#; $HOME/.shell/local_aliases
+#; Local aliases customized on a "per host" basis.
+
+#echo in ~/.shell/local_bfs-product-24/local_aliases
+#date
+
+alias j142='export JAVA_HOME=d:/java/j2sdk1.4.2_13'
+alias lc='cd /d/dev/gitrepos/trunk/lagancentre.git'
+alias lu='cd /d/dev/gitrepos/trunk/laganutil.git'
+
+
+if [ $cygwin == true ]; then
+	alias vim='VIM=`cygpath -d $VIM` HOME=`cygpath -d $HOME` `cygpath -u $VIMRUNTIME`/gvim.exe'
+else
+	alias vim='$VIMRUNTIME/gvim.exe'
+fi
+
+alias hudson_restart='ssh root@bfs-pdt-build-1 "service tomcat restart"'
+alias hudson_ssh='ssh tomcat@bfs-pdt-build-1'
+alias svn_ssh='ssh root@prod-build-1'
+
+alias t='~/shell/tools/todo.sh'
+alias tls='~/shell/tools/todo.sh ls'
+alias work='tls @work'
+alias tedit='vim d:/Users/gmcwilliams/Dropbox/Personal/documents/todo/todo.txt'
+alias tstart='cd /d/Users/gmcwilliams/Applications/apache-tomcat-6.0.32/bin;./startup.sh'
+alias tstop='cd /d/Users/gmcwilliams/Applications/apache-tomcat-6.0.32/bin;./shutdown.sh'
+
+export VISUAL=vim
+export EDITOR=$VISUAL
+export SVNEDITOR=$EDITOR
+
+#; $Id: local_aliases,v 1.20 2005/02/07 10:53:33 gary Exp $
