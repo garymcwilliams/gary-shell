@@ -16,9 +16,9 @@ else
 	alias vim='$VIMRUNTIME/gvim.exe'
 fi
 
-alias hudson_restart='ssh root@bfs-pdt-build-1 "service tomcat restart"'
-alias hudson_ssh='ssh tomcat@bfs-pdt-build-1'
-alias svn_ssh='ssh root@prod-build-1'
+alias hudson_restart='ssh root@bfs-pdt-build-1.lagan.com "service tomcat restart"'
+alias hudson_ssh='ssh tomcat@bfs-pdt-build-1.lagan.com'
+alias svn_ssh='ssh root@prod-build-1.lagan.com'
 
 alias t='~/shell/tools/todo.sh'
 alias tls='~/shell/tools/todo.sh ls'
