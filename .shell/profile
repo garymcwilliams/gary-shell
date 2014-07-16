@@ -135,7 +135,7 @@ fi
 if (type less &>/dev/null); then
  PAGER="less"
  export PAGER
- LESS_VERSION=$(less -V 2>&1|head -1|awk '{print $NF}'|awk -F'+' '{print $1}')
+ LESS_VERSION=$(less -V 2>&1|head -1|awk '{print NF}'|awk -F'+' '{print $1}')
  if [ "${LESS_VERSION:-0}" -gt "340" ]; then
   LESS='-giMR'
   export LESS

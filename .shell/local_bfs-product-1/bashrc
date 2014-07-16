@@ -14,16 +14,16 @@
 # End
 #bind '"\M-[4~": end-of-line'
 
-LOCAL_APPS=/d/Users/gmcwilliams/Applications
+LOCAL_APPS=/d/Applications
 
 #; Gary Added Java
 if [ ".$JAVA_HOME" = "." ]; then
-	JAVA_HOME=/d/Java/64/jdk1.7.0_09
+	JAVA_HOME=$LOCAL_APPS/Java/64/jdk1.7.0_55
 fi
 
 #; Gary Added ant
 if [ ".$ANT_HOME" = "." ]; then
-	ANT_HOME=$LOCAL_APPS/apache-ant-1.8.2
+	ANT_HOME=$LOCAL_APPS/apache-ant-1.9.4
 fi
 
 #; Gary Added tomcat
@@ -33,7 +33,7 @@ fi
 
 #; Gary Added Maven2
 if [ ".$M2_HOME" = "." ]; then
-	MAVEN_HOME=$LOCAL_APPS/apache-maven-3.0.4
+	MAVEN_HOME=$LOCAL_APPS/apache-maven-3.2.1
 	M2_HOME=$MAVEN_HOME
 	M2=$M2_HOME/bin
 fi
@@ -47,10 +47,10 @@ fi
 
 #; Gary Added vim
 if [ ".$VIM" = "." ]; then
-	export VIM=/d/Users/Applications/Vim
+	export VIM=$LOCAL_APPS/Vim
 fi
 if [ ".$VIMRUNTIME" = "." ]; then
-	export VIMRUNTIME=$VIM/vim73
+	export VIMRUNTIME=$VIM/vim74
 	echo $VIMRUNTIME
 fi
 
