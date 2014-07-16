@@ -18,7 +18,8 @@ LOCAL_APPS=/d/Applications
 
 #; Gary Added Java
 if [ ".$JAVA_HOME" = "." ]; then
-	JAVA_HOME=$LOCAL_APPS/Java/64/jdk1.7.0_55
+	JAVA_HOME=/d/Java/64/jdk1.7.0_65
+	echo $JAVA_HOME
 fi
 
 #; Gary Added ant
