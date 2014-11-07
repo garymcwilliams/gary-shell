@@ -72,5 +72,6 @@ case $TERM in
 esac
 # check for Git Bash
 #test -e /bin/git.exe && PS1="${TITLEBAR}$BROWN\w$(__git_ps1)\n\r$WHITE\$$NO_COLOUR "
-test -e /bin/git.exe && PS1='\[\033]0;\w\007\033[32m\]\[\033[33m\w$(__git_ps1)\033[0m\]
+#        Bash: PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
+test -e /bin/git.exe && PS1='\[\033]0;\w\007\033[32m\]\[\033[33m\w$(__git_ps1 " (%s)")\033[0m\]
 $ '

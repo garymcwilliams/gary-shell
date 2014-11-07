@@ -84,6 +84,17 @@ if [ $mingw == false ] && [ "$TERM" != "dumb" ]; then
     eval "`dircolors -b`"
 fi
 
+# add git prompt support
+source ~/shell/tools/git-prompt.sh
+# Show if there are unstaged (*) and/or staged (+) changes
+export GIT_PS1_SHOWDIRTYSTATE=1
+# Show if there is anything stashed ($)
+export GIT_PS1_SHOWSTASHSTATE=1
+# Show if there are untracked files (%)
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+# Show how we're tracking relative to upstream
+export GIT_PS1_SHOWUPSTREAM="verbose"
+
 #echo out bashrc
 
 #; $Id: bashrc,v 1.13 2004/11/30 11:13:34 gary Exp $
