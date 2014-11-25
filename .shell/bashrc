@@ -50,7 +50,7 @@ export PATH
 
 #; Add in local directories, just for fun and convenience
 #PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
-export PATH
+#export PATH
 
 #; Setup a safe $TMP dir
 if [ -d "${HOME}/tmp" ]; then
