@@ -60,11 +60,6 @@ if [ ".$VIMRUNTIME" = "." ]; then
 fi
 
 if [ $cygwin == true ]; then
-	echo ${JAVA_HOME}
-	echo $ANT_HOME
-	echo $TOMCAT_HOME
-	echo $MAVEN_HOME
-	echo $GROOVY_HOME
 	JAVA_HOME=`cygpath --windows ${JAVA_HOME}`
 	java=`cygpath --unix "$JAVA_HOME"`
 	ANT_HOME=`cygpath --windows $ANT_HOME`
