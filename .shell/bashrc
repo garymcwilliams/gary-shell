@@ -41,9 +41,9 @@ fi
 unset MAILCHECK
 
 #; Localised configuration
-if [ -f ${HOME}/shell/.shell/local_$NODENAME/bashrc ]; then
-#      echo ${HOME}/shell/.shell/local_$NODENAME/bashrc
-      . ${HOME}/shell/.shell/local_$NODENAME/bashrc
+if [ -f ${HOME}/shell/.shell/local_$(hostname)/bashrc ]; then
+      echo "including: ${HOME}/shell/.shell/local_$(hostname)/bashrc"
+      . ${HOME}/shell/.shell/local_$(hostname)/bashrc
 fi
 
 export PATH
@@ -75,8 +75,8 @@ if [ -d ~/shell/tools ]; then
   fi
 fi
 
-if [ -d ~/shell/tools_$NODENAME ]; then
-	PATH="~/shell/tools_$NODENAME:$PATH"
+if [ -d ~/shell/tools_$(hostname) ]; then
+	PATH="~/shell/tools_$(hostname):$PATH"
 fi
 
 # enable color support of ls and also add handy aliases
