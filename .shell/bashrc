@@ -6,7 +6,7 @@
 # If not running interactively, don't do anything:
 [ -z "$PS1" ] && return
 
-#echo in bashrc
+#echo "in ${BASH_SOURCE[0]}"
 #date
 
 SHELL=bash
