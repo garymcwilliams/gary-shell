@@ -22,7 +22,7 @@ Darwin*) darwin=true;;
 esac
 
 # don't put duplicate lines in the history. See bash(1) for more options
-#export HISTCONTROL=ignoredups
+export HISTCONTROL=ignoredups
 
 # make cygwin case insensitive
 #shopt -s nocaseglob
