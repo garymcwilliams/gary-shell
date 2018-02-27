@@ -11,3 +11,7 @@ if [ -r ~/shell/.shell/bashrc ]; then
 #  echo "including ~/shell/.shell/bashrc"
   . ~/shell/.shell/bashrc
 fi
+
+export VAGRANT_HOME="d:/dev/.vagrant.d"
+#echo "done"
+
